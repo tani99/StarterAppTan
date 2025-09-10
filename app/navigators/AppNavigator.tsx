@@ -8,6 +8,7 @@ import { ComponentProps } from "react"
 import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 
+import { LoadingScreen } from "@/components/LoadingScreen"
 import Config from "@/config"
 import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
@@ -44,19 +45,7 @@ const AppStack = () => {
 
   // Show loading screen during auth initialization
   if (isLoading || authState === AuthState.LOADING) {
-    return (
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          navigationBarColor: colors.background,
-          contentStyle: {
-            backgroundColor: colors.background,
-          },
-        }}
-      >
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      </Stack.Navigator>
-    )
+    return <LoadingScreen message="Initializing..." />
   }
 
   // Show auth flow for unauthenticated users

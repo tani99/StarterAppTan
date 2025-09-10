@@ -1,8 +1,10 @@
 import { FC } from "react"
-import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { Alert, Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 
+import { Button } from "@/components/Button"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
+import { useAuth } from "@/context/AuthContext"
 import { isRTL } from "@/i18n"
 import { useAppTheme } from "@/theme/context"
 import { $styles } from "@/theme/styles"
@@ -14,8 +16,29 @@ const welcomeFace = require("@assets/images/welcome-face.png")
 
 export const WelcomeScreen: FC = function WelcomeScreen() {
   const { themed, theme } = useAppTheme()
+  const { user, signOut } = useAuth()
 
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
+
+  const handleSignOut = async () => {
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const result = await signOut()
+            if (!result.success) {
+              Alert.alert("Error", "Failed to sign out. Please try again.")
+            }
+          } catch {
+            Alert.alert("Error", "An unexpected error occurred.")
+          }
+        },
+      },
+    ])
+  }
 
   return (
     <Screen preset="fixed" contentContainerStyle={$styles.flex1}>
@@ -37,7 +60,21 @@ export const WelcomeScreen: FC = function WelcomeScreen() {
       </View>
 
       <View style={themed([$bottomContainer, $bottomContainerInsets])}>
-        <Text tx="welcomeScreen:postscript" size="md" />
+        <View style={themed($userInfoContainer)}>
+          <Text
+            text={`Welcome, ${user?.displayName || user?.email || "User"}!`}
+            preset="subheading"
+            style={themed($userWelcome)}
+          />
+          <Text tx="welcomeScreen:postscript" size="md" />
+        </View>
+
+        <Button
+          text="Sign Out"
+          preset="reversed"
+          onPress={handleSignOut}
+          style={themed($signOutButton)}
+        />
       </View>
     </Screen>
   )
@@ -79,4 +116,20 @@ const $welcomeFace: ImageStyle = {
 
 const $welcomeHeading: ThemedStyle<TextStyle> = ({ spacing }) => ({
   marginBottom: spacing.md,
+})
+
+const $userInfoContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  flex: 1,
+  justifyContent: "center",
+  paddingVertical: spacing.sm,
+})
+
+const $userWelcome: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
+  color: colors.text,
+  marginBottom: spacing.sm,
+  textAlign: "center",
+})
+
+const $signOutButton: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+  marginTop: spacing.md,
 })

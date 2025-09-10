@@ -2,6 +2,7 @@ import { useState } from "react"
 import { View, ViewStyle, TextStyle } from "react-native"
 
 import { Button } from "@/components/Button"
+import { LoadingIndicator } from "@/components/LoadingIndicator"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
@@ -251,6 +252,7 @@ export const RegisterScreen = (props: RegisterScreenProps) => {
           onPress={handleSignUp}
           disabled={isLoading}
           style={themed($signUpButton)}
+          RightAccessory={isLoading ? (props) => <LoadingIndicator {...props} /> : undefined}
         />
       </View>
 

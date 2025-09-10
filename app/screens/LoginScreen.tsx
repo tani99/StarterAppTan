@@ -2,6 +2,7 @@ import { useState } from "react"
 import { View, ViewStyle, TextStyle } from "react-native"
 
 import { Button } from "@/components/Button"
+import { LoadingIndicator } from "@/components/LoadingIndicator"
 import { Screen } from "@/components/Screen"
 import { Text } from "@/components/Text"
 import { TextField } from "@/components/TextField"
@@ -174,6 +175,7 @@ export const LoginScreen = (props: LoginScreenProps) => {
           onPress={handleSignIn}
           disabled={isLoading}
           style={themed($signInButton)}
+          RightAccessory={isLoading ? (props) => <LoadingIndicator {...props} /> : undefined}
         />
 
         {/* Forgot Password Link */}

@@ -29,6 +29,7 @@ import { AppNavigator } from "./navigators/AppNavigator"
 import { useNavigationPersistence } from "./navigators/navigationUtilities"
 import { ThemeProvider } from "./theme/context"
 import { customFontsToLoad } from "./theme/typography"
+import { logFirebaseStatus } from "./utils/firebaseTest"
 import { loadDateFnsLocale } from "./utils/formatDate"
 import * as storage from "./utils/storage"
 
@@ -74,6 +75,12 @@ export function App() {
     initI18n()
       .then(() => setIsI18nInitialized(true))
       .then(() => loadDateFnsLocale())
+      .then(() => {
+        // Test Firebase connection on app startup
+        if (__DEV__) {
+          logFirebaseStatus()
+        }
+      })
   }, [])
 
   // Before we show the app, we have to wait for our state to be ready.

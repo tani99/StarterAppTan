@@ -9,26 +9,18 @@ import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 
 import Config from "@/config"
+import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { WelcomeScreen } from "@/screens/WelcomeScreen"
+import { AuthState } from "@/services/auth"
 import { useAppTheme } from "@/theme/context"
 
+import { AuthNavigator } from "./AuthNavigator"
+import type { AppStackParamList, RootStackParamList } from "./navigationTypes"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 
-/**
- * This type allows TypeScript to know what routes are defined in this navigator
- * as well as what properties (if any) they might take when navigating to them.
- *
- * For more information, see this documentation:
- *   https://reactnavigation.org/docs/params/
- *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
- *   https://reactnavigation.org/docs/typescript/#organizing-types
- */
-export type AppStackParamList = {
-  Welcome: undefined
-  // 🔥 Your screens go here
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
-}
+// Re-export types for external use
+export type { RootStackParamList }
 
 /**
  * This is a list of all the route names that will exit the app if the back button
@@ -48,7 +40,31 @@ const AppStack = () => {
   const {
     theme: { colors },
   } = useAppTheme()
+  const { authState, isLoading } = useAuth()
 
+  // Show loading screen during auth initialization
+  if (isLoading || authState === AuthState.LOADING) {
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          navigationBarColor: colors.background,
+          contentStyle: {
+            backgroundColor: colors.background,
+          },
+        }}
+      >
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+      </Stack.Navigator>
+    )
+  }
+
+  // Show auth flow for unauthenticated users
+  if (authState === AuthState.UNAUTHENTICATED) {
+    return <AuthNavigator />
+  }
+
+  // Show main app flow for authenticated users
   return (
     <Stack.Navigator
       screenOptions={{
@@ -67,15 +83,33 @@ const AppStack = () => {
 }
 
 export interface NavigationProps
-  extends Partial<ComponentProps<typeof NavigationContainer<AppStackParamList>>> {}
+  extends Partial<ComponentProps<typeof NavigationContainer<RootStackParamList>>> {}
 
 export const AppNavigator = (props: NavigationProps) => {
   const { navigationTheme } = useAppTheme()
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
+  // Deep linking configuration for auth-related links
+  const linking = {
+    prefixes: [
+      // Add your app's deep link prefixes here
+      // For example: 'myapp://', 'https://myapp.com/'
+    ],
+    config: {
+      screens: {
+        // Auth screens
+        Login: "login",
+        Register: "register",
+        // Main app screens
+        Welcome: "welcome",
+        // Add more screens as needed
+      },
+    },
+  }
+
   return (
-    <NavigationContainer ref={navigationRef} theme={navigationTheme} {...props}>
+    <NavigationContainer ref={navigationRef} theme={navigationTheme} linking={linking} {...props}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
         <AppStack />
       </ErrorBoundary>

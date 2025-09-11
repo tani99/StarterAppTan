@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native"
+import { Pressable, PressableProps, StyleProp, TextStyle, View, ViewStyle } from "react-native"
 
 import { Screen, ScreenProps } from "@/components/Screen"
 import { Text, TextProps } from "@/components/Text"
@@ -16,6 +16,10 @@ export interface MainContentScreenProps extends Omit<ScreenProps, "children"> {
    */
   titleProps?: TextProps
   /**
+   * Optional callback to fire when the title is pressed.
+   */
+  onTitlePress?: PressableProps["onPress"]
+  /**
    * The subtitle text to display below the title.
    */
   subtitle?: string
@@ -27,6 +31,10 @@ export interface MainContentScreenProps extends Omit<ScreenProps, "children"> {
    * Main content to render in the screen body.
    */
   children?: ReactNode
+  /**
+   * An optional ReactNode to render on the right side of the header.
+   */
+  HeaderActions?: ReactNode
   /**
    * Optional style override for the header container.
    */
@@ -71,9 +79,11 @@ export function MainContentScreen(props: MainContentScreenProps) {
   const {
     title,
     titleProps,
+    onTitlePress,
     subtitle,
     subtitleProps,
     children,
+    HeaderActions,
     headerStyle,
     contentStyle,
     titleContainerStyle,
@@ -85,21 +95,26 @@ export function MainContentScreen(props: MainContentScreenProps) {
 
   return (
     <Screen {...screenProps}>
-      {showHeader && (title || subtitle) && (
+      {showHeader && (
         <View style={[themed($headerContainer), headerStyle]}>
-          {title && (
-            <View style={[themed($titleContainer), titleContainerStyle]}>
-              <Text preset="heading" text={title} style={themed($titleText)} {...titleProps} />
-            </View>
-          )}
-          {subtitle && (
-            <Text
-              preset="subheading"
-              text={subtitle}
-              style={themed($subtitleText)}
-              {...subtitleProps}
-            />
-          )}
+          <View style={themed($headerMainContent)}>
+            {title && (
+              <Pressable onPress={onTitlePress} disabled={!onTitlePress}>
+                <View style={[themed($titleContainer), titleContainerStyle]}>
+                  <Text preset="heading" text={title} style={themed($titleText)} {...titleProps} />
+                </View>
+              </Pressable>
+            )}
+            {subtitle && (
+              <Text
+                preset="subheading"
+                text={subtitle}
+                style={themed($subtitleText)}
+                {...subtitleProps}
+              />
+            )}
+          </View>
+          {HeaderActions && <View style={themed($headerActionsContainer)}>{HeaderActions}</View>}
         </View>
       )}
 
@@ -109,9 +124,16 @@ export function MainContentScreen(props: MainContentScreenProps) {
 }
 
 const $headerContainer: ThemedStyle<ViewStyle> = (theme) => ({
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
   paddingHorizontal: theme.spacing.lg,
   paddingTop: theme.spacing.md,
   paddingBottom: theme.spacing.lg,
+})
+
+const $headerMainContent: ThemedStyle<ViewStyle> = () => ({
+  flex: 1,
 })
 
 const $titleContainer: ThemedStyle<ViewStyle> = (theme) => ({
@@ -124,6 +146,10 @@ const $titleText: ThemedStyle<TextStyle> = (theme) => ({
 
 const $subtitleText: ThemedStyle<TextStyle> = (theme) => ({
   color: theme.colors.textDim,
+})
+
+const $headerActionsContainer: ThemedStyle<ViewStyle> = () => ({
+  marginLeft: "auto",
 })
 
 const $contentContainer: ThemedStyle<ViewStyle> = (theme) => ({

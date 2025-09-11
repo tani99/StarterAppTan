@@ -1,3 +1,2 @@
 export * from "./MainContentScreen"
-export * from "./ProfileScreenTemplate"  
-export * from "./FormScreen"
+export * from "./ProfileScreenTemplate"

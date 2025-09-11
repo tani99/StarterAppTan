@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAuthState(state)
       // Always clear initializing state after first auth state change
       setIsInitializing(false)
-      
+
       // Only clear loading state if we're not in the middle of a sign-in operation
       if (!isSigningIn) {
         setIsLoading(false)

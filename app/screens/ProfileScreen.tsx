@@ -17,10 +17,13 @@ interface ProfileScreenProps extends AppStackScreenProps<"Profile"> {}
  */
 export const ProfileScreen = (props: ProfileScreenProps) => {
   const { navigation } = props
-  const { user, signOut, isLoading } = useAuth()
+  const { user, signOut, isLoading, updateProfile } = useAuth()
   const { themed } = useAppTheme()
 
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const [isEditingDisplayName, setIsEditingDisplayName] = useState(false)
+  const [editingDisplayName, setEditingDisplayName] = useState("")
+  const [isUpdatingDisplayName, setIsUpdatingDisplayName] = useState(false)
 
   /**
    * Navigate back to Welcome screen
@@ -92,8 +95,113 @@ export const ProfileScreen = (props: ProfileScreenProps) => {
     }
   }
 
+  /**
+   * Toggle display name edit mode
+   */
+  const handleToggleEditDisplayName = () => {
+    if (isEditingDisplayName) {
+      // Cancel editing
+      setIsEditingDisplayName(false)
+      setEditingDisplayName("")
+    } else {
+      // Start editing
+      setEditingDisplayName(user?.displayName || "")
+      setIsEditingDisplayName(true)
+    }
+  }
+
+  /**
+   * Handle display name change during editing
+   */
+  const handleDisplayNameChange = (value: string) => {
+    setEditingDisplayName(value)
+  }
+
+  /**
+   * Save display name changes
+   */
+  const handleSaveDisplayName = async () => {
+    const trimmedName = editingDisplayName.trim()
+    
+    if (!trimmedName) {
+      const errorMessage = "Display name cannot be empty."
+      if (Platform.OS === "web") {
+        window.alert(errorMessage)
+      } else {
+        Alert.alert("Error", errorMessage)
+      }
+      return
+    }
+
+    if (trimmedName === user?.displayName) {
+      // No change, just exit edit mode
+      setIsEditingDisplayName(false)
+      setEditingDisplayName("")
+      return
+    }
+
+    setIsUpdatingDisplayName(true)
+    try {
+      console.log("[ProfileScreen] Updating display name to:", trimmedName)
+      const result = await updateProfile({ displayName: trimmedName })
+
+      if (result.success) {
+        console.log("[ProfileScreen] Display name updated successfully")
+        setIsEditingDisplayName(false)
+        setEditingDisplayName("")
+        
+        const successMessage = "Display name updated successfully!"
+        if (Platform.OS === "web") {
+          // For web, we'll just log success since alerts can be intrusive
+          console.log(successMessage)
+        } else {
+          Alert.alert("Success", successMessage)
+        }
+      } else {
+        console.log("[ProfileScreen] Display name update failed:", result.error)
+        const errorMessage = result.error?.message || "Failed to update display name. Please try again."
+        
+        if (Platform.OS === "web") {
+          window.alert(errorMessage)
+        } else {
+          Alert.alert("Error", errorMessage)
+        }
+      }
+    } catch (error) {
+      console.log("[ProfileScreen] Display name update exception:", error)
+      const errorMessage = "An unexpected error occurred while updating your display name."
+      
+      if (Platform.OS === "web") {
+        window.alert(errorMessage)
+      } else {
+        Alert.alert("Error", errorMessage)
+      }
+    } finally {
+      setIsUpdatingDisplayName(false)
+    }
+  }
+
+  /**
+   * Cancel display name editing
+   */
+  const handleCancelEditDisplayName = () => {
+    setIsEditingDisplayName(false)
+    setEditingDisplayName("")
+  }
+
   return (
-    <ProfileScreenTemplate user={user} preset="scroll" style={themed($screenStyle)}>
+    <ProfileScreenTemplate 
+      user={user} 
+      preset="scroll" 
+      style={themed($screenStyle)}
+      isEditingDisplayName={isEditingDisplayName}
+      editingDisplayName={editingDisplayName}
+      isUpdatingDisplayName={isUpdatingDisplayName}
+      onToggleEditDisplayName={handleToggleEditDisplayName}
+      onDisplayNameChange={handleDisplayNameChange}
+      onSaveDisplayName={handleSaveDisplayName}
+      onCancelEditDisplayName={handleCancelEditDisplayName}
+    >
       {/* Account Actions Section */}
       <View style={themed($actionsContainer)}>
         <Text preset="subheading" text="Account Actions" style={themed($sectionTitle)} />

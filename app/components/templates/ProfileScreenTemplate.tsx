@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native"
+import { StyleProp, TextStyle, View, ViewStyle, TouchableOpacity } from "react-native"
 
 import { Button } from "@/components/Button"
 import { Icon } from "@/components/Icon"
@@ -27,6 +27,29 @@ export interface ProfileScreenTemplateProps extends Omit<ScreenProps, "children"
    * Optional style override for the content container.
    */
   contentStyle?: StyleProp<ViewStyle>
+  /**
+   * Optional back button configuration.
+   */
+  backButton?: {
+    onPress: () => void
+    text?: string
+  }
+  /**
+   * Optional edit mode toggle button configuration.
+   */
+  editButton?: {
+    isEditing: boolean
+    onToggle: () => void
+  }
+  /**
+   * Optional global action buttons for edit mode.
+   */
+  actionButtons?: {
+    onCancel: () => void
+    onSave: () => void
+    isSaving?: boolean
+    canSave?: boolean
+  }
   /**
    * Optional style override for the avatar container.
    */
@@ -117,6 +140,9 @@ export function ProfileScreenTemplate(props: ProfileScreenTemplateProps) {
     onDisplayNameChange,
     onSaveDisplayName,
     onCancelEditDisplayName,
+    backButton,
+    editButton,
+    actionButtons,
     ...screenProps
   } = props
 
@@ -150,212 +176,117 @@ export function ProfileScreenTemplate(props: ProfileScreenTemplateProps) {
     <Screen {...screenProps}>
       {/* User Header Section */}
       <View style={[themed($headerContainer), headerStyle]}>
-        {/* Avatar Container */}
-        <View style={[themed($avatarContainer), avatarContainerStyle]}>
-          <View style={themed($avatarPlaceholder)}>
-            <Icon icon="settings" size={40} color={themed($avatarIcon).color} />
-          </View>
-        </View>
-
-        {/* User Info Container */}
-        <View style={[themed($userInfoContainer), userInfoStyle]}>
-          {/* Display Name - Editable */}
-          {isEditingDisplayName ? (
-            <View style={themed($editDisplayNameContainer)}>
-              <TextField
-                value={editingDisplayName}
-                onChangeText={onDisplayNameChange}
-                placeholder="Enter display name"
-                style={themed($editDisplayNameInput)}
-                containerStyle={themed($editDisplayNameFieldContainer)}
-                inputWrapperStyle={themed($editDisplayNameInputWrapper)}
-                autoFocus
-              />
-              <View style={themed($editButtonsContainer)}>
-                <Button
-                  text="Cancel"
-                  preset="default"
-                  onPress={onCancelEditDisplayName}
-                  style={themed($cancelButton)}
-                  textStyle={themed($cancelButtonText)}
-                  disabled={isUpdatingDisplayName}
-                />
-                <Button
-                  text={isUpdatingDisplayName ? "Saving..." : "Save"}
-                  preset="default"
-                  onPress={onSaveDisplayName}
-                  style={themed($saveButton)}
-                  textStyle={themed($saveButtonText)}
-                  disabled={isUpdatingDisplayName || !editingDisplayName.trim()}
-                />
-              </View>
-            </View>
-          ) : (
-            <View style={themed($displayNameContainer)}>
-              <Text
-                preset="heading"
-                text={user?.displayName || "Anonymous User"}
-                style={themed($displayNameText)}
-                {...displayNameProps}
-              />
-              {onToggleEditDisplayName && (
-                <Button
-                  text="Edit"
-                  preset="default"
-                  onPress={onToggleEditDisplayName}
-                  style={themed($editButton)}
-                  textStyle={themed($editButtonText)}
-                />
-              )}
-            </View>
-          )}
-
-          {user?.email && (
-            <Text preset="default" text={user.email} style={themed($emailText)} {...emailProps} />
-          )}
-
-          <Text
-            preset="default"
-            text={formatMemberSince(user?.metadata?.creationTime)}
-            style={themed($memberSinceText)}
-            {...memberSinceProps}
+        {/* Left Action */}
+        {backButton && !editButton?.isEditing && (
+          <TouchableOpacity
+            onPress={backButton.onPress}
+            style={themed($backIconButton)}
+          >
+            <Icon
+              icon="back"
+              size={24}
+              color={themed($backIconColor)}
+            />
+          </TouchableOpacity>
+        )}
+        
+        {editButton?.isEditing && actionButtons && (
+          <Button
+            text="Cancel"
+            preset="ghost"
+            onPress={actionButtons.onCancel}
+            style={themed($cancelActionButton)}
+            textStyle={themed($cancelActionButtonText)}
           />
-        </View>
+        )}
+
+        {/* Right Action */}
+        {editButton?.isEditing && actionButtons ? (
+          <Button
+            text={actionButtons.isSaving ? "Saving..." : "Save"}
+            preset="ghost"
+            onPress={actionButtons.onSave}
+            style={themed($saveActionButton)}
+            textStyle={themed($saveActionButtonText)}
+            disabled={actionButtons.isSaving || !actionButtons.canSave}
+          />
+        ) : (
+          editButton && (
+            <Button
+              text={editButton.isEditing ? "Done" : "Edit"}
+              preset="ghost"
+              onPress={editButton.onToggle}
+              style={themed($editModeButton)}
+              textStyle={themed($editModeButtonText)}
+            />
+          )
+        )}
+
       </View>
 
       {/* Content Area */}
-      {children && <View style={[themed($contentContainer), contentStyle]}>{children}</View>}
+      <View style={[themed($contentContainer), contentStyle]}>
+        {/* Profile Title */}
+        <Text preset="heading" text="Profile" style={themed($profileTitle)} />
+        
+        {children}
+      </View>
     </Screen>
   )
 }
 
 // Styled components using ThemedStyle
 const $headerContainer: ThemedStyle<ViewStyle> = (theme) => ({
-  flexDirection: "column",
+  flexDirection: "row",
+  justifyContent: "space-between",
   alignItems: "center",
   paddingHorizontal: theme.spacing.lg,
-  paddingTop: theme.spacing.xl,
-  paddingBottom: theme.spacing.lg,
-  borderBottomWidth: 1,
-  borderBottomColor: theme.colors.separator,
+  paddingTop: theme.spacing.lg,
+  paddingBottom: theme.spacing.md,
+  backgroundColor: theme.colors.background,
 })
 
-const $avatarContainer: ThemedStyle<ViewStyle> = (theme) => ({
-  marginBottom: theme.spacing.md,
+const $backIconButton: ThemedStyle<ViewStyle> = (theme) => ({
+  padding: theme.spacing.xs,
+  alignSelf: "flex-start",
 })
 
-const $avatarPlaceholder: ThemedStyle<ViewStyle> = (theme) => ({
-  width: 80,
-  height: 80,
-  borderRadius: 40,
-  backgroundColor: theme.colors.palette.neutral200,
-  alignItems: "center",
-  justifyContent: "center",
-  borderWidth: 2,
-  borderColor: theme.colors.palette.neutral300,
+const $backIconColor: ThemedStyle<string> = (theme) => theme.colors.text
+
+const $editModeButton: ThemedStyle<ViewStyle> = (theme) => ({
+  alignSelf: "flex-end",
 })
 
-const $avatarIcon: ThemedStyle<{ color: string }> = (theme) => ({
-  color: theme.colors.palette.neutral500,
+const $editModeButtonText: ThemedStyle<TextStyle> = (theme) => ({
+  color: theme.colors.text,
 })
 
-const $userInfoContainer: ThemedStyle<ViewStyle> = (_theme) => ({
-  alignItems: "center",
+const $cancelActionButton: ThemedStyle<ViewStyle> = (theme) => ({
+  alignSelf: "flex-start",
 })
 
-const $displayNameContainer: ThemedStyle<ViewStyle> = (theme) => ({
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom: theme.spacing.xs,
+const $cancelActionButtonText: ThemedStyle<TextStyle> = (theme) => ({
+  color: theme.colors.textDim,
 })
 
-const $displayNameText: ThemedStyle<TextStyle> = (theme) => ({
-  textAlign: "center",
-  marginRight: theme.spacing.sm,
+const $saveActionButton: ThemedStyle<ViewStyle> = (theme) => ({
+  alignSelf: "flex-end",
 })
 
-const $editButton: ThemedStyle<ViewStyle> = (theme) => ({
-  backgroundColor: "transparent",
-  borderWidth: 1,
-  borderColor: theme.colors.palette.neutral400,
-  paddingHorizontal: theme.spacing.sm,
-  paddingVertical: theme.spacing.xs,
-  minHeight: 0,
+const $saveActionButtonText: ThemedStyle<TextStyle> = (theme) => ({
+  color: theme.colors.palette.primary500,
 })
 
-const $editButtonText: ThemedStyle<TextStyle> = (theme) => ({
-  color: theme.colors.palette.primary600,
-  fontSize: 12,
-})
-
-const $editDisplayNameContainer: ThemedStyle<ViewStyle> = (theme) => ({
-  width: "100%",
-  alignItems: "center",
-  marginBottom: theme.spacing.xs,
-})
-
-const $editDisplayNameFieldContainer: ThemedStyle<ViewStyle> = (theme) => ({
-  width: "100%",
-  maxWidth: 280,
-  marginBottom: theme.spacing.sm,
-})
-
-const $editDisplayNameInputWrapper: ThemedStyle<ViewStyle> = (theme) => ({
-  borderColor: theme.colors.palette.primary600,
-  backgroundColor: theme.colors.palette.neutral100,
-})
-
-const $editDisplayNameInput: ThemedStyle<TextStyle> = (theme) => ({
-  textAlign: "center",
-  fontSize: 18,
-  fontWeight: "600",
-})
-
-const $editButtonsContainer: ThemedStyle<ViewStyle> = (theme) => ({
-  flexDirection: "row",
-  gap: theme.spacing.sm,
-})
-
-const $cancelButton: ThemedStyle<ViewStyle> = (theme) => ({
-  backgroundColor: "transparent",
-  borderWidth: 1,
-  borderColor: theme.colors.palette.neutral400,
+const $profileTitle: ThemedStyle<TextStyle> = (theme) => ({
+  color: theme.colors.text,
+  textAlign: "left",
+  marginBottom: theme.spacing.lg,
   paddingHorizontal: theme.spacing.md,
-  paddingVertical: theme.spacing.sm,
-  minHeight: 0,
 })
 
-const $cancelButtonText: ThemedStyle<TextStyle> = (theme) => ({
-  color: theme.colors.textDim,
-  fontSize: 14,
-})
 
-const $saveButton: ThemedStyle<ViewStyle> = (theme) => ({
-  backgroundColor: theme.colors.palette.primary600,
-  borderWidth: 1,
-  borderColor: theme.colors.palette.primary600,
-  paddingHorizontal: theme.spacing.md,
-  paddingVertical: theme.spacing.sm,
-  minHeight: 0,
-})
 
-const $saveButtonText: ThemedStyle<TextStyle> = (theme) => ({
-  color: theme.colors.palette.neutral100,
-  fontSize: 14,
-})
 
-const $emailText: ThemedStyle<TextStyle> = (theme) => ({
-  color: theme.colors.textDim,
-  marginBottom: theme.spacing.xs,
-  textAlign: "center",
-})
-
-const $memberSinceText: ThemedStyle<TextStyle> = (theme) => ({
-  color: theme.colors.textDim,
-  fontSize: 14,
-  textAlign: "center",
-})
 
 const $contentContainer: ThemedStyle<ViewStyle> = (theme) => ({
   flex: 1,

@@ -22,12 +22,14 @@
       "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
     },
     "allowBackup": false,
-    "edgeToEdgeEnabled": true
+    "edgeToEdgeEnabled": true,
+    "googleServicesFile": "./android/app/google-services.json"
   },
   "ios": {
     "icon": "./assets/images/app-icon-ios.png",
     "supportsTablet": true,
     "bundleIdentifier": "com.starterapptan",
+    "googleServicesFile": "./ios/GoogleService-Info.plist",
     "privacyManifests": {
       "NSPrivacyAccessedAPITypes": [
         {

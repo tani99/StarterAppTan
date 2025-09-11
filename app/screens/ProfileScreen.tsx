@@ -3,7 +3,9 @@ import { Alert, Platform, TextStyle, View, ViewStyle } from "react-native"
 
 import { Button } from "@/components/Button"
 import { ProfileScreenTemplate } from "@/components/templates"
+import { Switch } from "@/components/Toggle/Switch"
 import { Text } from "@/components/Text"
+import { TextField } from "@/components/TextField"
 import { useAuth } from "@/context/AuthContext"
 import { AppStackScreenProps } from "@/navigators/navigationTypes"
 import { useAppTheme } from "@/theme/context"
@@ -18,7 +20,7 @@ interface ProfileScreenProps extends AppStackScreenProps<"Profile"> {}
 export const ProfileScreen = (props: ProfileScreenProps) => {
   const { navigation } = props
   const { user, signOut, isLoading, updateProfile } = useAuth()
-  const { themed } = useAppTheme()
+  const { themed, toggleTheme, themeContext } = useAppTheme()
 
   const [isSigningOut, setIsSigningOut] = useState(false)
   const [isEditingDisplayName, setIsEditingDisplayName] = useState(false)
@@ -122,7 +124,7 @@ export const ProfileScreen = (props: ProfileScreenProps) => {
    */
   const handleSaveDisplayName = async () => {
     const trimmedName = editingDisplayName.trim()
-    
+
     if (!trimmedName) {
       const errorMessage = "Display name cannot be empty."
       if (Platform.OS === "web") {
@@ -149,7 +151,7 @@ export const ProfileScreen = (props: ProfileScreenProps) => {
         console.log("[ProfileScreen] Display name updated successfully")
         setIsEditingDisplayName(false)
         setEditingDisplayName("")
-        
+
         const successMessage = "Display name updated successfully!"
         if (Platform.OS === "web") {
           // For web, we'll just log success since alerts can be intrusive
@@ -159,8 +161,9 @@ export const ProfileScreen = (props: ProfileScreenProps) => {
         }
       } else {
         console.log("[ProfileScreen] Display name update failed:", result.error)
-        const errorMessage = result.error?.message || "Failed to update display name. Please try again."
-        
+        const errorMessage =
+          result.error?.message || "Failed to update display name. Please try again."
+
         if (Platform.OS === "web") {
           window.alert(errorMessage)
         } else {
@@ -170,7 +173,7 @@ export const ProfileScreen = (props: ProfileScreenProps) => {
     } catch (error) {
       console.log("[ProfileScreen] Display name update exception:", error)
       const errorMessage = "An unexpected error occurred while updating your display name."
-      
+
       if (Platform.OS === "web") {
         window.alert(errorMessage)
       } else {
@@ -190,80 +193,86 @@ export const ProfileScreen = (props: ProfileScreenProps) => {
   }
 
   return (
-    <ProfileScreenTemplate 
-      user={user} 
-      preset="scroll" 
+    <ProfileScreenTemplate
+      user={user}
+      preset="scroll"
       style={themed($screenStyle)}
-      isEditingDisplayName={isEditingDisplayName}
-      editingDisplayName={editingDisplayName}
-      isUpdatingDisplayName={isUpdatingDisplayName}
-      onToggleEditDisplayName={handleToggleEditDisplayName}
-      onDisplayNameChange={handleDisplayNameChange}
-      onSaveDisplayName={handleSaveDisplayName}
-      onCancelEditDisplayName={handleCancelEditDisplayName}
+      backButton={{
+        onPress: goBack,
+        text: "Back"
+      }}
+      editButton={{
+        isEditing: isEditingDisplayName,
+        onToggle: handleToggleEditDisplayName
+      }}
+      actionButtons={{
+        onCancel: handleCancelEditDisplayName,
+        onSave: handleSaveDisplayName,
+        isSaving: isUpdatingDisplayName,
+        canSave: !!editingDisplayName.trim()
+      }}
     >
-      {/* Account Actions Section */}
-      <View style={themed($actionsContainer)}>
-        <Text preset="subheading" text="Account Actions" style={themed($sectionTitle)} />
-
-        {/* Settings Placeholders */}
-        <View style={themed($actionsList)}>
-          <Button
-            text="Theme Settings"
+      {/* Email Section */}
+      <View style={themed($simpleSection)}>
+        <Text preset="formLabel" text="Email" style={themed($fieldLabel)} />
+        <View style={themed($displayFieldContainer)}>
+          <Text
             preset="default"
-            onPress={() => {
-              // TODO: Implement theme settings
-              console.log("Theme settings pressed")
-            }}
-            style={themed($actionButton)}
-            textStyle={themed($actionButtonText)}
-          />
-
-          <Button
-            text="Notifications"
-            preset="default"
-            onPress={() => {
-              // TODO: Implement notifications settings
-              console.log("Notifications pressed")
-            }}
-            style={themed($actionButton)}
-            textStyle={themed($actionButtonText)}
-          />
-
-          <Button
-            text="Privacy Settings"
-            preset="default"
-            onPress={() => {
-              // TODO: Implement privacy settings
-              console.log("Privacy settings pressed")
-            }}
-            style={themed($actionButton)}
-            textStyle={themed($actionButtonText)}
+            text={user?.email || "No email set"}
+            style={themed($displayFieldText)}
           />
         </View>
+      </View>
 
-        {/* Sign Out Button */}
+      {/* Display Name Section */}
+      <View style={themed($simpleSection)}>
+        <Text preset="formLabel" text="Display Name" style={themed($fieldLabel)} />
+        {isEditingDisplayName ? (
+          <TextField
+            value={editingDisplayName}
+            onChangeText={handleDisplayNameChange}
+            placeholder="Enter display name"
+            style={themed($editFieldInput)}
+            containerStyle={themed($editFieldWrapper)}
+            autoFocus
+          />
+        ) : (
+          <View style={themed($displayFieldContainer)}>
+            <Text
+              preset="default"
+              text={user?.displayName || "No display name set"}
+              style={themed($displayFieldText)}
+            />
+          </View>
+        )}
+      </View>
+
+      {/* Dark Mode Setting */}
+      <View style={themed($simpleSection)}>
+        <View style={themed($settingItem)}>
+          <View style={themed($settingContent)}>
+            <Text preset="default" text="Dark Mode" style={themed($settingLabel)} />
+            <Text preset="formHelper" text="Switch between light and dark themes" style={themed($settingDescription)} />
+          </View>
+          <Switch
+            value={themeContext === "dark"}
+            onValueChange={toggleTheme}
+          />
+        </View>
+      </View>
+
+      {/* Sign Out Button */}
+      <View style={themed($simpleSection)}>
         <Button
           text="Sign Out"
           preset="default"
           onPress={handleSignOut}
-          disabled={isLoading || isSigningOut}
           style={themed($signOutButton)}
           textStyle={themed($signOutButtonText)}
+          disabled={isSigningOut}
         />
       </View>
 
-      {/* Back Button */}
-      <View style={themed($footerContainer)}>
-        <Button
-          text="Back to Welcome"
-          preset="default"
-          onPress={goBack}
-          disabled={isLoading || isSigningOut}
-          style={themed($backButton)}
-          textStyle={themed($backButtonText)}
-        />
-      </View>
     </ProfileScreenTemplate>
   )
 }
@@ -274,55 +283,68 @@ const $screenStyle: ThemedStyle<ViewStyle> = (theme) => ({
   flex: 1,
 })
 
-const $actionsContainer: ThemedStyle<ViewStyle> = (theme) => ({
-  marginBottom: theme.spacing.xl,
-})
-
-const $sectionTitle: ThemedStyle<TextStyle> = (theme) => ({
-  marginBottom: theme.spacing.md,
-  color: theme.colors.text,
-})
-
-const $actionsList: ThemedStyle<ViewStyle> = (theme) => ({
-  gap: theme.spacing.sm,
+const $simpleSection: ThemedStyle<ViewStyle> = (theme) => ({
   marginBottom: theme.spacing.lg,
+  paddingHorizontal: theme.spacing.md,
 })
 
-const $actionButton: ThemedStyle<ViewStyle> = (theme) => ({
-  backgroundColor: theme.colors.palette.neutral100,
-  borderWidth: 1,
-  borderColor: theme.colors.border,
-  paddingVertical: theme.spacing.md,
-})
-
-const $actionButtonText: ThemedStyle<TextStyle> = (theme) => ({
+const $fieldLabel: ThemedStyle<TextStyle> = (theme) => ({
+  marginBottom: theme.spacing.sm,
   color: theme.colors.text,
 })
+
+const $editFieldInput: ThemedStyle<TextStyle> = (theme) => ({
+  color: theme.colors.text,
+})
+
+const $editFieldWrapper: ThemedStyle<ViewStyle> = (theme) => ({
+  backgroundColor: theme.colors.background,
+})
+
+const $displayFieldContainer: ThemedStyle<ViewStyle> = (theme) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingVertical: theme.spacing.sm,
+  borderBottomWidth: 1,
+  borderBottomColor: theme.colors.palette.neutral200,
+})
+
+const $displayFieldText: ThemedStyle<TextStyle> = (theme) => ({
+  color: theme.colors.text,
+  flex: 1,
+})
+
+const $settingItem: ThemedStyle<ViewStyle> = (theme) => ({
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingVertical: theme.spacing.sm,
+  borderBottomWidth: 1,
+  borderBottomColor: theme.colors.palette.neutral200,
+})
+
+const $settingContent: ThemedStyle<ViewStyle> = (theme) => ({
+  flex: 1,
+})
+
+const $settingLabel: ThemedStyle<TextStyle> = (theme) => ({
+  color: theme.colors.text,
+  marginBottom: theme.spacing.xxs,
+})
+
+const $settingDescription: ThemedStyle<TextStyle> = (theme) => ({
+  color: theme.colors.textDim,
+})
+
+
 
 const $signOutButton: ThemedStyle<ViewStyle> = (theme) => ({
-  backgroundColor: theme.colors.palette.neutral100,
-  borderWidth: 1,
-  borderColor: theme.colors.palette.angry500,
+  backgroundColor: theme.colors.palette.angry500,
   paddingVertical: theme.spacing.md,
 })
 
 const $signOutButtonText: ThemedStyle<TextStyle> = (theme) => ({
-  color: theme.colors.palette.angry500,
+  color: theme.colors.background,
 })
 
-const $footerContainer: ThemedStyle<ViewStyle> = (theme) => ({
-  marginTop: theme.spacing.lg,
-  paddingTop: theme.spacing.lg,
-  borderTopWidth: 1,
-  borderTopColor: theme.colors.separator,
-})
-
-const $backButton: ThemedStyle<ViewStyle> = (theme) => ({
-  backgroundColor: theme.colors.palette.neutral100,
-  borderWidth: 1,
-  borderColor: theme.colors.border,
-})
-
-const $backButtonText: ThemedStyle<TextStyle> = (theme) => ({
-  color: theme.colors.textDim,
-})

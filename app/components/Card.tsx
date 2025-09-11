@@ -1,5 +1,6 @@
-import { ComponentType, Fragment, ReactElement } from "react"
+import { ComponentType, Fragment, ReactElement, useRef } from "react"
 import {
+  Animated,
   StyleProp,
   TextStyle,
   TouchableOpacity,
@@ -15,7 +16,7 @@ import type { ThemedStyle, ThemedStyleArray } from "@/theme/types"
 
 import { Text, TextProps } from "./Text"
 
-type Presets = "default" | "reversed"
+type Presets = "default" | "reversed" | "elevated" | "outlined"
 
 interface CardProps extends TouchableOpacityProps {
   /**
@@ -158,9 +159,27 @@ export function Card(props: CardProps) {
     themed,
     theme: { spacing },
   } = useAppTheme()
+  const scaleAnim = useRef(new Animated.Value(1)).current
 
   const preset: Presets = props.preset ?? "default"
   const isPressable = !!WrapperProps.onPress
+
+  // Animation handlers
+  const handlePressIn = () => {
+    Animated.timing(scaleAnim, {
+      toValue: 0.98,
+      duration: 150,
+      useNativeDriver: true,
+    }).start()
+  }
+
+  const handlePressOut = () => {
+    Animated.timing(scaleAnim, {
+      toValue: 1,
+      duration: 150,
+      useNativeDriver: true,
+    }).start()
+  }
   const isHeadingPresent = !!(HeadingComponent || heading || headingTx)
   const isContentPresent = !!(ContentComponent || content || contentTx)
   const isFooterPresent = !!(FooterComponent || footer || footerTx)
@@ -205,11 +224,21 @@ export function Card(props: CardProps) {
       style={$containerStyle}
       activeOpacity={0.8}
       accessibilityRole={isPressable ? "button" : undefined}
+      onPressIn={isPressable ? handlePressIn : undefined}
+      onPressOut={isPressable ? handlePressOut : undefined}
       {...WrapperProps}
     >
-      {LeftComponent}
+      <Animated.View
+        style={[
+          { flex: 1, flexDirection: "row" },
+          {
+            transform: [{ scale: scaleAnim }],
+          },
+        ]}
+      >
+        {LeftComponent}
 
-      <View style={$alignmentWrapperStyle}>
+        <View style={$alignmentWrapperStyle}>
         <HeaderContentWrapper>
           {HeadingComponent ||
             (isHeadingPresent && (
@@ -248,23 +277,26 @@ export function Card(props: CardProps) {
               style={$footerStyle}
             />
           ))}
-      </View>
+        </View>
 
-      {RightComponent}
+        {RightComponent}
+      </Animated.View>
     </Wrapper>
   )
 }
 
 const $containerBase: ThemedStyle<ViewStyle> = (theme) => ({
-  borderRadius: theme.spacing.md,
-  padding: theme.spacing.xs,
+  borderRadius: 16,
+  padding: theme.spacing.md,
   borderWidth: 1,
+  borderColor: theme.colors.palette.neutral200,
+  backgroundColor: theme.colors.palette.neutral100,
   shadowColor: theme.colors.palette.neutral800,
-  shadowOffset: { width: 0, height: 12 },
+  shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.08,
-  shadowRadius: 12.81,
-  elevation: 16,
-  minHeight: 96,
+  shadowRadius: 8,
+  elevation: 3,
+  minHeight: 120,
 })
 
 const $alignmentWrapper: ViewStyle = {
@@ -285,7 +317,30 @@ const $containerPresets: Record<Presets, ThemedStyleArray<ViewStyle>> = {
     $containerBase,
     (theme) => ({
       backgroundColor: theme.colors.palette.neutral100,
+      borderColor: theme.colors.palette.neutral200,
+    }),
+  ],
+  elevated: [
+    $styles.row,
+    $containerBase,
+    (theme) => ({
+      backgroundColor: theme.colors.palette.neutral100,
+      borderColor: theme.colors.palette.neutral200,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.12,
+      shadowRadius: 12,
+      elevation: 6,
+    }),
+  ],
+  outlined: [
+    $styles.row,
+    $containerBase,
+    (theme) => ({
+      backgroundColor: "transparent",
       borderColor: theme.colors.palette.neutral300,
+      borderWidth: 2,
+      shadowOpacity: 0,
+      elevation: 0,
     }),
   ],
   reversed: [
@@ -300,15 +355,21 @@ const $containerPresets: Record<Presets, ThemedStyleArray<ViewStyle>> = {
 
 const $headingPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   default: [],
+  elevated: [],
+  outlined: [],
   reversed: [(theme) => ({ color: theme.colors.palette.neutral100 })],
 }
 
 const $contentPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   default: [],
+  elevated: [],
+  outlined: [],
   reversed: [(theme) => ({ color: theme.colors.palette.neutral100 })],
 }
 
 const $footerPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   default: [],
+  elevated: [],
+  outlined: [],
   reversed: [(theme) => ({ color: theme.colors.palette.neutral100 })],
 }

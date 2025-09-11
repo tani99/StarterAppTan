@@ -252,7 +252,7 @@ export function Screen(props: ScreenProps) {
     systemBarStyle,
   } = props
 
-  const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges)
+  const $containerInsets = useSafeAreaInsetsStyle(safeAreaEdges || ["top", "bottom", "left", "right"])
 
   return (
     <View

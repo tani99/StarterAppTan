@@ -36,9 +36,11 @@ This is a React Native Expo application built with the Ignite CLI boilerplate, f
 
 ### Key Architectural Patterns
 
-**Provider-Based Architecture**: The app uses multiple context providers for theme, keyboard handling, and safe area management. All providers are set up in `app/app.tsx`.
+**Provider-Based Architecture**: The app uses multiple context providers for theme, keyboard handling, safe area management, and authentication. All providers are set up in `app/app.tsx`.
 
 **Preset-Based Components**: UI components in `app/components/` use preset patterns for consistent styling variations. Each component accepts a `preset` prop for different visual configurations.
+
+**Template-Based Architecture**: Screen templates in `app/components/templates/` provide standardized layouts for common screen patterns (FormScreen, ProfileScreenTemplate, MainContentScreen).
 
 **Themed Styling**: Dynamic styling system with light/dark mode support via `app/theme/context.tsx`. Use `useAppTheme()` hook to access theme values.
 
@@ -47,6 +49,8 @@ This is a React Native Expo application built with the Ignite CLI boilerplate, f
 - `@/screens` → `app/screens`
 - `@/theme` → `app/theme`
 - `@/utils` → `app/utils`
+- `@/services` → `app/services`
+- `@/context` → `app/context`
 - etc.
 
 ### Core Directories
@@ -55,11 +59,23 @@ This is a React Native Expo application built with the Ignite CLI boilerplate, f
 - `Screen.tsx` - Screen wrapper with multiple layout presets
 - `Text.tsx`, `Button.tsx` - Core themed UI elements
 - `Header.tsx`, `ListItem.tsx` - Complex layout components
-- `Toggle/` - Complete toggle component system
+- `Toggle/` - Complete toggle component system (Radio, Checkbox, Switch)
+- `templates/` - Screen templates for consistent layouts (FormScreen, ProfileScreenTemplate, MainContentScreen)
+- `LoadingIndicator.tsx`, `LoadingScreen.tsx` - Loading state components
 
-**`app/screens/`**: Screen components that compose the app's pages. Use the `Screen` component wrapper for consistent layouts.
+**`app/screens/`**: Screen components that compose the app's pages. Use the `Screen` component wrapper for consistent layouts. Includes authentication screens (LoginScreen, RegisterScreen, ForgotPasswordScreen) and main app screens (WelcomeScreen, ProfileScreen).
 
-**`app/navigators/`**: React Navigation v7 setup with type-safe navigation. Navigation types are defined in `AppStackParamList`.
+**`app/navigators/`**: React Navigation v7 setup with type-safe navigation. Features protected routes with AuthNavigator and AppNavigator. Navigation types are defined in separate parameter lists for auth and main app flows.
+
+**`app/services/auth/`**: Firebase authentication service with:
+- `authService.ts` - Core Firebase integration class
+- `authTypes.ts` - TypeScript interfaces and types
+- `authErrors.ts` - Error handling and user-friendly error messages
+- Complete auth operations: login, register, password reset, profile updates
+
+**`app/context/`**: React context providers for global state:
+- `AuthContext.tsx` - Authentication state management with persistent storage
+- Integrates with existing theme and other context providers
 
 **`app/theme/`**: Comprehensive theming system with:
 - Context provider for theme state
@@ -67,7 +83,7 @@ This is a React Native Expo application built with the Ignite CLI boilerplate, f
 - Typography definitions using expo-google-fonts
 - Spacing and timing tokens
 
-**`app/services/`**: API integration layer using Apisauce. Environment-specific configuration in `app/config/`.
+**`app/services/`**: API integration layer using Apisauce, plus Firebase authentication service. Environment-specific configuration in `app/config/`.
 
 **`app/i18n/`**: Internationalization with i18next, supporting 7 languages with RTL support for Arabic.
 
@@ -94,11 +110,11 @@ This is a React Native Expo application built with the Ignite CLI boilerplate, f
 
 **Component Creation**: When creating new components, follow the preset pattern established in existing components. Reference `app/components/Text.tsx` or `app/components/Button.tsx` for examples.
 
-**Screen Development**: Always wrap screens with the `Screen` component from `@/components`. Use appropriate presets (`fixed`, `scroll`, `auto`) based on content needs.
+**Screen Development**: Always wrap screens with the `Screen` component from `@/components`. Use appropriate presets (`fixed`, `scroll`, `auto`) based on content needs. Consider using screen templates from `@/components/templates` for common patterns.
 
 **Styling**: Use themed functions for dynamic styling. Access theme via `useAppTheme()` hook. Reference existing themed components for patterns.
 
-**Navigation**: Type-safe navigation is enforced. Add new routes to `AppStackParamList` type in the navigator files.
+**Navigation**: Type-safe navigation is enforced. The app uses protected routes with separate navigation stacks for authentication and main app. Add new routes to the appropriate parameter list types.
 
 **API Integration**: Use the existing API service in `app/services/api/`. Follow the established pattern for adding new endpoints.
 
@@ -107,6 +123,8 @@ This is a React Native Expo application built with the Ignite CLI boilerplate, f
 ### Storage and State Management
 
 **Persistent Storage**: Uses MMKV via the storage utilities in `app/utils/storage/`. Preferred for app preferences and user settings.
+
+**Authentication State**: User authentication state is automatically persisted using MMKV and restored on app launch via AuthContext.
 
 **Theme Persistence**: Theme preferences are automatically persisted and restored on app launch.
 
@@ -117,6 +135,8 @@ This is a React Native Expo application built with the Ignite CLI boilerplate, f
 **`tsconfig.json`**: TypeScript configuration with path aliases and strict type checking enabled.
 
 **`app.config.ts`**: Expo configuration with iOS privacy manifests and splash screen plugin.
+
+**`app/config/firebase.ts`**: Firebase configuration for authentication services.
 
 **`babel.config.js`**: Babel configuration for React Native and Expo compatibility.
 

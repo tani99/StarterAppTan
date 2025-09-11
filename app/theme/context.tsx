@@ -31,6 +31,7 @@ import type {
 export type ThemeContextType = {
   navigationTheme: NavTheme
   setThemeContextOverride: (newTheme: ThemeContextModeT) => void
+  toggleTheme: () => void
   theme: Theme
   themeContext: ImmutableThemeContextModeT
   themed: ThemedFnT
@@ -83,6 +84,15 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     return t === "dark" ? "dark" : "light"
   }, [initialContext, themeScheme, systemColorScheme])
 
+  /**
+   * This function toggles between light and dark themes.
+   * If currently light, switches to dark. If currently dark, switches to light.
+   */
+  const toggleTheme = useCallback(() => {
+    const newTheme = themeContext === "light" ? "dark" : "light"
+    setThemeScheme(newTheme)
+  }, [themeContext, setThemeScheme])
+
   const navigationTheme: NavTheme = useMemo(() => {
     switch (themeContext) {
       case "dark":
@@ -126,6 +136,7 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({
     theme,
     themeContext,
     setThemeContextOverride,
+    toggleTheme,
     themed,
   }
 

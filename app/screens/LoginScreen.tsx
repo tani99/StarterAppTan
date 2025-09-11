@@ -230,9 +230,13 @@ const $contentContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   paddingBottom: spacing.lg,
 })
 
-const $headerContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $headerContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   alignItems: "center",
   marginBottom: spacing.xxl,
+  paddingVertical: spacing.xl,
+  backgroundColor: colors.palette.neutral100,
+  borderRadius: 24,
+  marginHorizontal: spacing.lg,
 })
 
 const $title: ThemedStyle<ViewStyle> = ({ spacing }) => ({
@@ -243,8 +247,16 @@ const $subtitle: ThemedStyle<TextStyle> = ({ colors }) => ({
   color: colors.textDim,
 })
 
-const $formContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({
+const $formContainer: ThemedStyle<ViewStyle> = ({ spacing, colors }) => ({
   marginBottom: spacing.xl,
+  backgroundColor: colors.palette.neutral100,
+  borderRadius: 20,
+  padding: spacing.lg,
+  shadowColor: colors.palette.neutral800,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.05,
+  shadowRadius: 8,
+  elevation: 2,
 })
 
 const $inputContainer: ThemedStyle<ViewStyle> = ({ spacing }) => ({

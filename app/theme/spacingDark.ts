@@ -11,4 +11,21 @@ export const spacing = {
   xl: 32 * SPACING_MULTIPLIER,
   xxl: 48 * SPACING_MULTIPLIER,
   xxxl: 64 * SPACING_MULTIPLIER,
+
+  // New semantic spacing tokens (same as light theme for consistency)
+  component: {
+    padding: 16,
+    margin: 12,
+    gap: 8,
+  },
+  layout: {
+    section: 32,
+    container: 24,
+    card: 16,
+  },
+  text: {
+    line: 4,
+    paragraph: 12,
+    heading: 8,
+  },
 } as const

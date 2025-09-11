@@ -11,7 +11,7 @@ import { typography } from "@/theme/typography"
 
 type Sizes = keyof typeof $sizeStyles
 type Weights = keyof typeof typography.primary
-type Presets = "default" | "bold" | "heading" | "subheading" | "formLabel" | "formHelper"
+type Presets = "default" | "bold" | "heading" | "subheading" | "formLabel" | "formHelper" | "caption" | "overline" | "display"
 
 export interface TextProps extends RNTextProps {
   /**
@@ -80,13 +80,15 @@ export const Text = forwardRef(function Text(props: TextProps, ref: ForwardedRef
 })
 
 const $sizeStyles = {
-  xxl: { fontSize: 36, lineHeight: 44 } satisfies TextStyle,
-  xl: { fontSize: 24, lineHeight: 34 } satisfies TextStyle,
-  lg: { fontSize: 20, lineHeight: 32 } satisfies TextStyle,
-  md: { fontSize: 18, lineHeight: 26 } satisfies TextStyle,
-  sm: { fontSize: 16, lineHeight: 24 } satisfies TextStyle,
-  xs: { fontSize: 14, lineHeight: 21 } satisfies TextStyle,
-  xxs: { fontSize: 12, lineHeight: 18 } satisfies TextStyle,
+  // Refined sizes with better line heights and letter spacing
+  xxl: { fontSize: 32, lineHeight: 40, letterSpacing: -0.5 } satisfies TextStyle,
+  xl: { fontSize: 28, lineHeight: 36, letterSpacing: -0.25 } satisfies TextStyle,
+  lg: { fontSize: 24, lineHeight: 32, letterSpacing: 0 } satisfies TextStyle,
+  md: { fontSize: 20, lineHeight: 28, letterSpacing: 0 } satisfies TextStyle,
+  sm: { fontSize: 16, lineHeight: 24, letterSpacing: 0 } satisfies TextStyle,
+  xs: { fontSize: 14, lineHeight: 20, letterSpacing: 0.1 } satisfies TextStyle,
+  xxs: { fontSize: 12, lineHeight: 16, letterSpacing: 0.2 } satisfies TextStyle,
+  xxxs: { fontSize: 10, lineHeight: 14, letterSpacing: 0.3 } satisfies TextStyle,
 }
 
 const $fontWeightStyles = Object.entries(typography.primary).reduce((acc, [weight, fontFamily]) => {
@@ -112,5 +114,8 @@ const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   subheading: [$baseStyle, { ...$sizeStyles.lg, ...$fontWeightStyles.medium }],
   formLabel: [$baseStyle, { ...$fontWeightStyles.medium }],
   formHelper: [$baseStyle, { ...$sizeStyles.sm, ...$fontWeightStyles.normal }],
+  caption: [$baseStyle, { ...$sizeStyles.xxs, ...$fontWeightStyles.normal }],
+  overline: [$baseStyle, { ...$sizeStyles.xxxs, ...$fontWeightStyles.medium, textTransform: "uppercase" }],
+  display: [$baseStyle, { ...$sizeStyles.xxl, ...$fontWeightStyles.bold, letterSpacing: -0.5 }],
 }
 const $rtlStyle: TextStyle = isRTL ? { writingDirection: "rtl" } : {}

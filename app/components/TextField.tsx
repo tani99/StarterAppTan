@@ -1,5 +1,6 @@
-import { ComponentType, forwardRef, Ref, useImperativeHandle, useRef } from "react"
+import { ComponentType, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react"
 import {
+  Animated,
   ImageStyle,
   StyleProp,
   // eslint-disable-next-line no-restricted-imports
@@ -132,6 +133,8 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     ...TextInputProps
   } = props
   const input = useRef<TextInput>(null)
+  const [isFocused, setIsFocused] = useState(false)
+  const focusAnim = useRef(new Animated.Value(0)).current
 
   const {
     themed,
@@ -151,7 +154,10 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
   const $inputWrapperStyles = [
     $styles.row,
     $inputWrapperStyle,
-    status === "error" && { borderColor: colors.error },
+    status === "error" && { 
+      borderColor: colors.error,
+      backgroundColor: colors.errorBackground,
+    },
     TextInputProps.multiline && { minHeight: 112 },
     LeftAccessory && { paddingStart: 0 },
     RightAccessory && { paddingEnd: 0 },
@@ -181,6 +187,26 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     input.current?.focus()
   }
 
+  const handleFocus = (e: any) => {
+    setIsFocused(true)
+    Animated.timing(focusAnim, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: false,
+    }).start()
+    TextInputProps.onFocus?.(e)
+  }
+
+  const handleBlur = (e: any) => {
+    setIsFocused(false)
+    Animated.timing(focusAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: false,
+    }).start()
+    TextInputProps.onBlur?.(e)
+  }
+
   useImperativeHandle(ref, () => input.current as TextInput)
 
   return (
@@ -201,7 +227,37 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
         />
       )}
 
-      <View style={themed($inputWrapperStyles)}>
+      <Animated.View 
+        style={[
+          themed($inputWrapperStyles),
+          {
+            borderColor: focusAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [colors.palette.neutral300, colors.palette.primary500],
+            }),
+            backgroundColor: focusAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [colors.palette.neutral100, colors.palette.neutral100],
+            }),
+            shadowColor: focusAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [colors.palette.neutral800, colors.palette.primary500],
+            }),
+            shadowOpacity: focusAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 0.1],
+            }),
+            shadowRadius: focusAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 4],
+            }),
+            elevation: focusAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 2],
+            }),
+          },
+        ]}
+      >
         {!!LeftAccessory && (
           <LeftAccessory
             style={themed($leftAccessoryStyle)}
@@ -220,6 +276,8 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           {...TextInputProps}
           editable={!disabled}
           style={themed($inputStyles)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
         />
 
         {!!RightAccessory && (
@@ -230,7 +288,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
             multiline={TextInputProps.multiline ?? false}
           />
         )}
-      </View>
+      </Animated.View>
 
       {!!(helper || helperTx) && (
         <Text
@@ -250,16 +308,18 @@ const $labelStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
   marginBottom: spacing.xs,
 })
 
-const $inputWrapperStyle: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $inputWrapperStyle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   alignItems: "flex-start",
-  borderWidth: 1,
-  borderRadius: 4,
-  backgroundColor: colors.palette.neutral200,
-  borderColor: colors.palette.neutral400,
+  borderWidth: 1.5,
+  borderRadius: 12,
+  backgroundColor: colors.palette.neutral100,
+  borderColor: colors.palette.neutral300,
   overflow: "hidden",
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
 })
 
-const $inputStyle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
+const $inputStyle: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
   flex: 1,
   alignSelf: "stretch",
   fontFamily: typography.primary.normal,
@@ -269,8 +329,6 @@ const $inputStyle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) =>
   // https://github.com/facebook/react-native/issues/21720#issuecomment-532642093
   paddingVertical: 0,
   paddingHorizontal: 0,
-  marginVertical: spacing.xs,
-  marginHorizontal: spacing.sm,
 })
 
 const $helperStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({

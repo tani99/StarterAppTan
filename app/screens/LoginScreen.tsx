@@ -94,11 +94,9 @@ export const LoginScreen = (props: LoginScreenProps) => {
 
       const result = await signIn(credentials)
 
-      if (result.success) {
-        // Navigation will be handled by the navigation logic based on auth state
-        console.log("Login successful")
-      } else {
-        setGeneralError(result.error?.message || "Login failed. Please try again.")
+      if (!result.success) {
+        const errorMessage = result.error?.message || "Login failed. Please try again."
+        setGeneralError(errorMessage)
       }
     } catch (error) {
       console.error("Login error:", error)
@@ -167,6 +165,21 @@ export const LoginScreen = (props: LoginScreenProps) => {
             <Text preset="formHelper" text={generalError} style={themed($errorText)} />
           </View>
         ) : null}
+        {/* Debug Panel - Uncomment for debugging 
+        {__DEV__ && (
+          <View style={{ padding: 10, backgroundColor: '#f0f0f0', marginBottom: 10, borderRadius: 5 }}>
+            <Text style={{ fontSize: 12, color: '#666' }}>
+              Debug Info: Error: {generalError || 'none'}, Loading: {String(isLoading)}
+            </Text>
+            <Button 
+              text="Test Error" 
+              onPress={() => setGeneralError('Test error message')}
+              style={{ marginTop: 5, backgroundColor: '#ddd', padding: 5 }}
+              textStyle={{ color: '#666', fontSize: 12 }}
+            />
+          </View>
+        )}
+        */}
 
         {/* Sign In Button */}
         <Button

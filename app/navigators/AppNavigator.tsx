@@ -41,10 +41,10 @@ const AppStack = () => {
   const {
     theme: { colors },
   } = useAppTheme()
-  const { authState, isLoading } = useAuth()
+  const { authState, isInitializing } = useAuth()
 
-  // Show loading screen during auth initialization
-  if (isLoading || authState === AuthState.LOADING) {
+  // Show loading screen during auth initialization only
+  if (isInitializing || authState === AuthState.LOADING) {
     return <LoadingScreen message="Initializing..." />
   }
 

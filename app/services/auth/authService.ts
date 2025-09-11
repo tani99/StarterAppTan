@@ -1,7 +1,7 @@
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
+  signOut as firebaseSignOut,
   sendPasswordResetEmail,
   updateProfile,
   onAuthStateChanged,
@@ -49,6 +49,13 @@ class AuthService {
     this.unsubscribe = onAuthStateChanged(auth, (user) => {
       const authUser = user ? this.mapFirebaseUserToAuthUser(user) : null
       const authState = user ? AuthState.AUTHENTICATED : AuthState.UNAUTHENTICATED
+
+      console.log("[AuthService] Auth state changed:", {
+        hasUser: !!user,
+        uid: user?.uid,
+        authState,
+        listenersCount: this.listeners.length,
+      })
 
       // Notify all registered listeners
       this.listeners.forEach((listener) => listener(authUser, authState))
@@ -180,12 +187,16 @@ class AuthService {
    * Signs out the current user
    */
   signOut = async (): Promise<AuthResult> => {
+    console.log("[AuthService] signOut called")
     try {
-      await signOut(auth)
+      console.log("[AuthService] Calling firebaseSignOut...")
+      await firebaseSignOut(auth)
+      console.log("[AuthService] firebaseSignOut successful")
       return {
         success: true,
       }
     } catch (error) {
+      console.log("[AuthService] firebaseSignOut failed:", error)
       return {
         success: false,
         error: mapFirebaseAuthError(error),

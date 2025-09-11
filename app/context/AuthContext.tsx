@@ -19,6 +19,7 @@ interface AuthContextType {
   user: AuthUser | null
   authState: AuthState
   isLoading: boolean
+  isInitializing: boolean
 
   // Auth actions
   signIn: (credentials: LoginCredentials) => Promise<AuthResult<AuthUser>>
@@ -58,7 +59,9 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [authState, setAuthState] = useState<AuthState>(AuthState.LOADING)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isInitializing, setIsInitializing] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSigningIn, setIsSigningIn] = useState(false)
 
   /**
    * Persists auth state to storage
@@ -92,14 +95,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   /**
    * Handles auth state changes from Firebase
    */
-  const handleAuthStateChange = useCallback(async (authUser: AuthUser | null, state: AuthState) => {
-    setUser(authUser)
-    setAuthState(state)
-    setIsLoading(false)
+  const handleAuthStateChange = useCallback(
+    async (authUser: AuthUser | null, state: AuthState) => {
+      setUser(authUser)
+      setAuthState(state)
+      // Always clear initializing state after first auth state change
+      setIsInitializing(false)
+      
+      // Only clear loading state if we're not in the middle of a sign-in operation
+      if (!isSigningIn) {
+        setIsLoading(false)
+      }
 
-    // Persist the new state
-    await persistAuthState(authUser, state)
-  }, [])
+      // Persist the new state
+      await persistAuthState(authUser, state)
+    },
+    [isSigningIn],
+  )
 
   /**
    * Initialize auth context
@@ -142,12 +154,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * Sign in wrapper with loading state
    */
   const signIn = async (credentials: LoginCredentials): Promise<AuthResult<AuthUser>> => {
+    setIsSigningIn(true)
     setIsLoading(true)
     try {
       const result = await authService.signIn(credentials)
+
+      // Always clear signing in state and loading state for failed attempts
+      if (!result.success) {
+        setIsSigningIn(false)
+        setIsLoading(false)
+      } else {
+        // For successful sign ins, Firebase auth state change will handle loading state
+        setIsSigningIn(false)
+      }
       return result
-    } finally {
+    } catch (error) {
+      console.error("AuthContext signIn error:", error)
+      setIsSigningIn(false)
       setIsLoading(false)
+      throw error
     }
   }
 
@@ -158,9 +183,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true)
     try {
       const result = await authService.signUp(credentials)
+      // Only keep loading if sign up was successful
+      // Failed sign ups should clear loading immediately
+      if (!result.success) {
+        setIsLoading(false)
+      }
       return result
-    } finally {
+    } catch (error) {
       setIsLoading(false)
+      throw error
     }
   }
 
@@ -168,18 +199,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
    * Sign out wrapper with loading state and cleanup
    */
   const signOut = async (): Promise<AuthResult> => {
+    console.log("[AuthContext] signOut called")
     setIsLoading(true)
     try {
+      console.log("[AuthContext] Calling authService.signOut...")
       const result = await authService.signOut()
+      console.log("[AuthContext] authService.signOut result:", result)
 
       // Clear persisted state on successful sign out
       if (result.success) {
+        console.log("[AuthContext] Clearing storage...")
         await storage.remove(AUTH_STORAGE_KEYS.USER)
         await storage.remove(AUTH_STORAGE_KEYS.STATE)
       }
 
       return result
     } finally {
+      console.log("[AuthContext] Setting isLoading to false")
       setIsLoading(false)
     }
   }
@@ -222,6 +258,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     authState,
     isLoading,
+    isInitializing,
 
     // Actions
     signIn,

@@ -150,10 +150,7 @@ export const RegisterScreen = (props: RegisterScreenProps) => {
 
       const result = await signUp(credentials)
 
-      if (result.success) {
-        // Navigation will be handled by the navigation logic based on auth state
-        console.log("Registration successful")
-      } else {
+      if (!result.success) {
         setGeneralError(result.error?.message || "Registration failed. Please try again.")
       }
     } catch (error) {

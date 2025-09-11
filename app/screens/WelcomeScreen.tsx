@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { Alert, Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
+import { Alert, Image, ImageStyle, Platform, TextStyle, View, ViewStyle } from "react-native"
 
 import { Button } from "@/components/Button"
 import { Screen } from "@/components/Screen"
@@ -21,23 +21,57 @@ export const WelcomeScreen: FC = function WelcomeScreen() {
   const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
 
   const handleSignOut = async () => {
-    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Sign Out",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const result = await signOut()
-            if (!result.success) {
-              Alert.alert("Error", "Failed to sign out. Please try again.")
-            }
-          } catch {
-            Alert.alert("Error", "An unexpected error occurred.")
-          }
+    console.log("[WelcomeScreen] Sign out button pressed")
+
+    if (Platform.OS === "web") {
+      // For web, use browser confirm dialog
+      console.log("[WelcomeScreen] Using web confirm dialog")
+      const confirmed = window.confirm("Are you sure you want to sign out?")
+      if (confirmed) {
+        console.log("[WelcomeScreen] User confirmed sign out")
+        await performSignOut()
+      } else {
+        console.log("[WelcomeScreen] User cancelled sign out")
+      }
+    } else {
+      // For mobile, use React Native Alert
+      Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: async () => {
+            console.log("[WelcomeScreen] User confirmed sign out")
+            await performSignOut()
+          },
         },
-      },
-    ])
+      ])
+    }
+  }
+
+  const performSignOut = async () => {
+    try {
+      console.log("[WelcomeScreen] Calling signOut...")
+      const result = await signOut()
+      console.log("[WelcomeScreen] SignOut result:", result)
+      if (!result.success) {
+        console.log("[WelcomeScreen] SignOut failed:", result.error)
+        if (Platform.OS === "web") {
+          window.alert("Failed to sign out. Please try again.")
+        } else {
+          Alert.alert("Error", "Failed to sign out. Please try again.")
+        }
+      } else {
+        console.log("[WelcomeScreen] SignOut successful")
+      }
+    } catch (error) {
+      console.log("[WelcomeScreen] SignOut exception:", error)
+      if (Platform.OS === "web") {
+        window.alert("An unexpected error occurred.")
+      } else {
+        Alert.alert("Error", "An unexpected error occurred.")
+      }
+    }
   }
 
   return (

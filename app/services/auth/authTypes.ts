@@ -72,25 +72,43 @@ export interface AuthError {
 
 /**
  * Firebase Auth error codes mapping
+ * Based on official Firebase JavaScript SDK AuthErrorCodes
  */
 export enum FirebaseAuthErrorCode {
-  // Login errors
+  // Authentication credential errors
+  INVALID_CREDENTIAL = "auth/invalid-credential",
   INVALID_EMAIL = "auth/invalid-email",
+  WRONG_PASSWORD = "auth/wrong-password",
   USER_DISABLED = "auth/user-disabled",
   USER_NOT_FOUND = "auth/user-not-found",
-  WRONG_PASSWORD = "auth/wrong-password",
 
   // Registration errors
   EMAIL_ALREADY_IN_USE = "auth/email-already-in-use",
-  OPERATION_NOT_ALLOWED = "auth/operation-not-allowed",
   WEAK_PASSWORD = "auth/weak-password",
 
-  // Network and other errors
+  // Account management
+  REQUIRES_RECENT_LOGIN = "auth/requires-recent-login",
+  USER_MISMATCH = "auth/user-mismatch",
+
+  // Operation errors
+  OPERATION_NOT_ALLOWED = "auth/operation-not-allowed",
+  POPUP_CLOSED_BY_USER = "auth/popup-closed-by-user",
+  POPUP_BLOCKED = "auth/popup-blocked",
+
+  // Network and system errors
   NETWORK_REQUEST_FAILED = "auth/network-request-failed",
   TOO_MANY_REQUESTS = "auth/too-many-requests",
   INTERNAL_ERROR = "auth/internal-error",
 
-  // Generic
+  // Session errors
+  USER_TOKEN_EXPIRED = "auth/user-token-expired",
+  INVALID_USER_TOKEN = "auth/invalid-user-token",
+
+  // Provider errors
+  ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL = "auth/account-exists-with-different-credential",
+  CREDENTIAL_ALREADY_IN_USE = "auth/credential-already-in-use",
+
+  // Generic fallback
   UNKNOWN = "auth/unknown",
 }
 

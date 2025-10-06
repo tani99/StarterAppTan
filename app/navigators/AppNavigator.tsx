@@ -1,20 +1,18 @@
 /**
- * The app navigator (formerly "AppNavigator" and "MainNavigator") is used for the primary
- * navigation flows of your app.
- * Generally speaking, it will contain an auth flow (registration, login, forgot password)
+ * The app navigator is used for the primary navigation flows of your app.
+ * It contains an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
 import { ComponentProps } from "react"
-import { NavigationContainer } from "@react-navigation/native"
+import { View, Text, ActivityIndicator } from "react-native"
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 
-import { LoadingScreen } from "@/components/LoadingScreen"
 import Config from "@/config"
 import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
 import { WelcomeScreen, ProfileScreen } from "@/screens/index"
 import { AuthState } from "@/services/auth"
-import { useAppTheme } from "@/theme/context"
 
 import { AuthNavigator } from "./AuthNavigator"
 import type { AppStackParamList, RootStackParamList } from "./navigationTypes"
@@ -38,14 +36,16 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 const Stack = createNativeStackNavigator<AppStackParamList>()
 
 const AppStack = () => {
-  const {
-    theme: { colors },
-  } = useAppTheme()
   const { authState, isInitializing } = useAuth()
 
   // Show loading screen during auth initialization only
   if (isInitializing || authState === AuthState.LOADING) {
-    return <LoadingScreen message="Initializing..." />
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#FFFFFF" }}>
+        <ActivityIndicator size="large" color="#000000" />
+        <Text style={{ marginTop: 20, fontSize: 16 }}>Initializing...</Text>
+      </View>
+    )
   }
 
   // Show auth flow for unauthenticated users
@@ -58,9 +58,8 @@ const AppStack = () => {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        navigationBarColor: colors.background,
         contentStyle: {
-          backgroundColor: colors.background,
+          backgroundColor: "#FFFFFF",
         },
       }}
     >
@@ -76,8 +75,6 @@ export interface NavigationProps
   extends Partial<ComponentProps<typeof NavigationContainer<RootStackParamList>>> {}
 
 export const AppNavigator = (props: NavigationProps) => {
-  const { navigationTheme } = useAppTheme()
-
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
 
   // Deep linking configuration for auth-related links
@@ -99,7 +96,7 @@ export const AppNavigator = (props: NavigationProps) => {
   }
 
   return (
-    <NavigationContainer ref={navigationRef} theme={navigationTheme} linking={linking} {...props}>
+    <NavigationContainer ref={navigationRef} theme={DefaultTheme} linking={linking} {...props}>
       <ErrorBoundary catchErrors={Config.catchErrors}>
         <AppStack />
       </ErrorBoundary>

@@ -1,16 +1,33 @@
-# Welcome to your new ignited app!
+# FashionApp 👗
 
-> The latest and greatest boilerplate for Infinite Red opinions
+A modern React Native fashion app built with Expo and Firebase.
 
-This is the boilerplate that [Infinite Red](https://infinite.red) uses as a way to test bleeding-edge changes to our React Native stack.
+## 🚀 Quick Start
 
-- [Quick start documentation](https://github.com/infinitered/ignite/blob/master/docs/boilerplate/Boilerplate.md)
-- [Full documentation](https://github.com/infinitered/ignite/blob/master/docs/README.md)
+### Prerequisites
+- Node.js >= 20.0.0
+- Firebase project (for authentication)
 
-## Getting Started
+### Initial Setup
 
+1. **Clone and install dependencies:**
 ```bash
+git clone <your-repo-url>
+cd FashionApp
 npm install
+```
+
+2. **Set up Firebase configuration:**
+```bash
+# Copy the example config file
+cp app/config/firebase.ts.example app/config/firebase.ts
+```
+
+Then edit `app/config/firebase.ts` with your Firebase project credentials.
+See detailed instructions in [app/config/firebase-setup.md](app/config/firebase-setup.md)
+
+3. **Start the development server:**
+```bash
 npm run start
 ```
 

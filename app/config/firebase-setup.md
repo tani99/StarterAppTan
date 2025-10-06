@@ -15,8 +15,12 @@
 4. Copy the config values
 
 ### Step 2: Update Configuration
-1. Open `app/config/firebase.ts`
-2. Replace the placeholder values with your actual Firebase config:
+1. Copy `app/config/firebase.ts.example` to `app/config/firebase.ts`
+   ```bash
+   cp app/config/firebase.ts.example app/config/firebase.ts
+   ```
+2. Open `app/config/firebase.ts`
+3. Replace the placeholder values with your actual Firebase config:
    - `apiKey`: Your Firebase API key
    - `authDomain`: Your project's auth domain
    - `projectId`: Your Firebase project ID
@@ -39,6 +43,8 @@ If building for native apps, you'll also need:
 For production builds, you may need to add Firebase plugins to your `app.config.ts`.
 
 ## Security Notes
-- Never commit real Firebase configuration to version control if your repo is public
-- Consider using environment variables for sensitive configuration
-- Set up Firebase Security Rules for production use
+- `firebase.ts` is in `.gitignore` to prevent committing your actual API keys
+- Only `firebase.ts.example` (with placeholder values) is committed to version control
+- Each developer must create their own `firebase.ts` from the example file
+- **IMPORTANT**: Set up Firebase Security Rules for production use to protect your data
+- Never commit `google-services.json` or `GoogleService-Info.plist` (already protected in `.gitignore`)

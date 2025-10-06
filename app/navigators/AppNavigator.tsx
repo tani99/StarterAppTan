@@ -11,7 +11,7 @@ import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navig
 import Config from "@/config"
 import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
-import { WelcomeScreen, ProfileScreen } from "@/screens/index"
+import { ProfileScreen } from "@/screens/index"
 import { AuthState } from "@/services/auth"
 
 import { AuthNavigator } from "./AuthNavigator"
@@ -62,8 +62,8 @@ const AppStack = () => {
           backgroundColor: "#FFFFFF",
         },
       }}
+      initialRouteName="Profile"
     >
-      <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       {/** 🔥 Your screens go here */}
       {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}

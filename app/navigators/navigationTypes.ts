@@ -4,6 +4,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
  * Authentication stack parameter list
  */
 export type AuthStackParamList = {
+  Welcome: undefined
   Login: undefined
   Register: undefined
   ForgotPassword: undefined
@@ -13,7 +14,6 @@ export type AuthStackParamList = {
  * Main application stack parameter list
  */
 export type AppStackParamList = {
-  Welcome: undefined
   Profile: undefined
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST

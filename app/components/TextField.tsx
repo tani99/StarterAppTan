@@ -1,350 +1,275 @@
-import { ComponentType, forwardRef, Ref, useImperativeHandle, useRef, useState } from "react"
-import {
-  Animated,
-  ImageStyle,
-  StyleProp,
-  // eslint-disable-next-line no-restricted-imports
-  TextInput,
-  TextInputProps,
-  TextStyle,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native"
-
-import { isRTL } from "@/i18n"
-import { translate } from "@/i18n/translate"
-import { useAppTheme } from "@/theme/context"
-import { $styles } from "@/theme/styles"
-import type { ThemedStyle, ThemedStyleArray } from "@/theme/types"
-
-import { Text, TextProps } from "./Text"
-
-export interface TextFieldAccessoryProps {
-  style: StyleProp<ViewStyle | TextStyle | ImageStyle>
-  status: TextFieldProps["status"]
-  multiline: boolean
-  editable: boolean
-}
-
-export interface TextFieldProps extends Omit<TextInputProps, "ref"> {
-  /**
-   * A style modifier for different input states.
-   */
-  status?: "error" | "disabled"
-  /**
-   * The label text to display if not using `labelTx`.
-   */
-  label?: TextProps["text"]
-  /**
-   * Label text which is looked up via i18n.
-   */
-  labelTx?: TextProps["tx"]
-  /**
-   * Optional label options to pass to i18n. Useful for interpolation
-   * as well as explicitly setting locale or translation fallbacks.
-   */
-  labelTxOptions?: TextProps["txOptions"]
-  /**
-   * Pass any additional props directly to the label Text component.
-   */
-  LabelTextProps?: TextProps
-  /**
-   * The helper text to display if not using `helperTx`.
-   */
-  helper?: TextProps["text"]
-  /**
-   * Helper text which is looked up via i18n.
-   */
-  helperTx?: TextProps["tx"]
-  /**
-   * Optional helper options to pass to i18n. Useful for interpolation
-   * as well as explicitly setting locale or translation fallbacks.
-   */
-  helperTxOptions?: TextProps["txOptions"]
-  /**
-   * Pass any additional props directly to the helper Text component.
-   */
-  HelperTextProps?: TextProps
-  /**
-   * The placeholder text to display if not using `placeholderTx`.
-   */
-  placeholder?: TextProps["text"]
-  /**
-   * Placeholder text which is looked up via i18n.
-   */
-  placeholderTx?: TextProps["tx"]
-  /**
-   * Optional placeholder options to pass to i18n. Useful for interpolation
-   * as well as explicitly setting locale or translation fallbacks.
-   */
-  placeholderTxOptions?: TextProps["txOptions"]
-  /**
-   * Optional input style override.
-   */
-  style?: StyleProp<TextStyle>
-  /**
-   * Style overrides for the container
-   */
-  containerStyle?: StyleProp<ViewStyle>
-  /**
-   * Style overrides for the input wrapper
-   */
-  inputWrapperStyle?: StyleProp<ViewStyle>
-  /**
-   * An optional component to render on the right side of the input.
-   * Example: `RightAccessory={(props) => <Icon icon="ladybug" containerStyle={props.style} color={props.editable ? colors.textDim : colors.text} />}`
-   * Note: It is a good idea to memoize this.
-   */
-  RightAccessory?: ComponentType<TextFieldAccessoryProps>
-  /**
-   * An optional component to render on the left side of the input.
-   * Example: `LeftAccessory={(props) => <Icon icon="ladybug" containerStyle={props.style} color={props.editable ? colors.textDim : colors.text} />}`
-   * Note: It is a good idea to memoize this.
-   */
-  LeftAccessory?: ComponentType<TextFieldAccessoryProps>
-}
-
 /**
- * A component that allows for the entering and editing of text.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/TextField/}
- * @param {TextFieldProps} props - The props for the `TextField` component.
- * @returns {JSX.Element} The rendered `TextField` component.
+ * TextField Component
+ * 
+ * A customizable text input component with label, error states, and icon support
  */
-export const TextField = forwardRef(function TextField(props: TextFieldProps, ref: Ref<TextInput>) {
-  const {
-    labelTx,
-    label,
-    labelTxOptions,
-    placeholderTx,
-    placeholder,
-    placeholderTxOptions,
-    helper,
-    helperTx,
-    helperTxOptions,
-    status,
-    RightAccessory,
-    LeftAccessory,
-    HelperTextProps,
-    LabelTextProps,
-    style: $inputStyleOverride,
-    containerStyle: $containerStyleOverride,
-    inputWrapperStyle: $inputWrapperStyleOverride,
-    ...TextInputProps
-  } = props
-  const input = useRef<TextInput>(null)
-  const [isFocused, setIsFocused] = useState(false)
-  const focusAnim = useRef(new Animated.Value(0)).current
 
-  const {
-    themed,
-    theme: { colors },
-  } = useAppTheme()
+import React, { useState } from "react"
+import {
+  View,
+  TextInput,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInputProps,
+  ViewStyle,
+  TextStyle,
+} from "react-native"
+import { colors, spacing, typography, borderRadius, borderWidth } from "../theme"
 
-  const disabled = TextInputProps.editable === false || status === "disabled"
-
-  const placeholderContent = placeholderTx
-    ? translate(placeholderTx, placeholderTxOptions)
-    : placeholder
-
-  const $containerStyles = [$containerStyleOverride]
-
-  const $labelStyles = [$labelStyle, LabelTextProps?.style]
-
-  const $inputWrapperStyles = [
-    $styles.row,
-    $inputWrapperStyle,
-    status === "error" && { 
-      borderColor: colors.error,
-      backgroundColor: colors.errorBackground,
-    },
-    TextInputProps.multiline && { minHeight: 112 },
-    LeftAccessory && { paddingStart: 0 },
-    RightAccessory && { paddingEnd: 0 },
-    $inputWrapperStyleOverride,
-  ]
-
-  const $inputStyles: ThemedStyleArray<TextStyle> = [
-    $inputStyle,
-    disabled && { color: colors.textDim },
-    isRTL && { textAlign: "right" as TextStyle["textAlign"] },
-    TextInputProps.multiline && { height: "auto" },
-    $inputStyleOverride,
-  ]
-
-  const $helperStyles = [
-    $helperStyle,
-    status === "error" && { color: colors.error },
-    HelperTextProps?.style,
-  ]
+export interface TextFieldProps extends Omit<TextInputProps, "style"> {
+  /**
+   * Label text displayed above the input
+   */
+  label?: string
 
   /**
-   *
+   * Placeholder text
    */
-  function focusInput() {
-    if (disabled) return
+  placeholder?: string
 
-    input.current?.focus()
+  /**
+   * Current value of the input
+   */
+  value: string
+
+  /**
+   * Callback when the text changes
+   */
+  onChangeText: (text: string) => void
+
+  /**
+   * Error message to display below the input
+   */
+  error?: string
+
+  /**
+   * Helper text to display below the input
+   */
+  helperText?: string
+
+  /**
+   * Whether the field is disabled
+   * @default false
+   */
+  disabled?: boolean
+
+  /**
+   * Icon to display on the left side
+   */
+  leftIcon?: React.ReactNode
+
+  /**
+   * Icon to display on the right side
+   */
+  rightIcon?: React.ReactNode
+
+  /**
+   * Whether this is a password field with show/hide toggle
+   * @default false
+   */
+  secureTextEntry?: boolean
+
+  /**
+   * Whether to show character counter
+   * @default false
+   */
+  showCharacterCount?: boolean
+
+  /**
+   * Maximum character length
+   */
+  maxLength?: number
+
+  /**
+   * Custom container style
+   */
+  containerStyle?: ViewStyle
+
+  /**
+   * Custom input style
+   */
+  inputStyle?: TextStyle
+
+  /**
+   * Custom label style
+   */
+  labelStyle?: TextStyle
+}
+
+export function TextField({
+  label,
+  placeholder,
+  value,
+  onChangeText,
+  error,
+  helperText,
+  disabled = false,
+  leftIcon,
+  rightIcon,
+  secureTextEntry = false,
+  showCharacterCount = false,
+  maxLength,
+  containerStyle,
+  inputStyle,
+  labelStyle,
+  ...textInputProps
+}: TextFieldProps) {
+  const [isFocused, setIsFocused] = useState(false)
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false)
+
+  const hasError = Boolean(error)
+  const showPasswordToggle = secureTextEntry
+  const isSecureEntry = secureTextEntry && !isPasswordVisible
+
+  // Determine border color based on state
+  const getBorderColor = () => {
+    if (hasError) return colors.border.error
+    if (isFocused) return colors.border.focus
+    return colors.border.default
   }
-
-  const handleFocus = (e: any) => {
-    setIsFocused(true)
-    Animated.timing(focusAnim, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: false,
-    }).start()
-    TextInputProps.onFocus?.(e)
-  }
-
-  const handleBlur = (e: any) => {
-    setIsFocused(false)
-    Animated.timing(focusAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: false,
-    }).start()
-    TextInputProps.onBlur?.(e)
-  }
-
-  useImperativeHandle(ref, () => input.current as TextInput)
 
   return (
-    <TouchableOpacity
-      activeOpacity={1}
-      style={$containerStyles}
-      onPress={focusInput}
-      accessibilityState={{ disabled }}
-    >
-      {!!(label || labelTx) && (
-        <Text
-          preset="formLabel"
-          text={label}
-          tx={labelTx}
-          txOptions={labelTxOptions}
-          {...LabelTextProps}
-          style={themed($labelStyles)}
-        />
+    <View style={[styles.container, containerStyle]}>
+      {/* Label */}
+      {label && (
+        <Text style={[styles.label, labelStyle, disabled && styles.labelDisabled]}>
+          {label}
+        </Text>
       )}
 
-      <Animated.View 
+      {/* Input Container */}
+      <View
         style={[
-          themed($inputWrapperStyles),
-          {
-            borderColor: focusAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [colors.palette.neutral300, colors.palette.primary500],
-            }),
-            backgroundColor: focusAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [colors.palette.neutral100, colors.palette.neutral100],
-            }),
-            shadowColor: focusAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [colors.palette.neutral800, colors.palette.primary500],
-            }),
-            shadowOpacity: focusAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, 0.1],
-            }),
-            shadowRadius: focusAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, 4],
-            }),
-            elevation: focusAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, 2],
-            }),
-          },
+          styles.inputContainer,
+          { borderColor: getBorderColor() },
+          disabled && styles.inputContainerDisabled,
         ]}
       >
-        {!!LeftAccessory && (
-          <LeftAccessory
-            style={themed($leftAccessoryStyle)}
-            status={status}
-            editable={!disabled}
-            multiline={TextInputProps.multiline ?? false}
-          />
-        )}
+        {/* Left Icon */}
+        {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
 
+        {/* Text Input */}
         <TextInput
-          ref={input}
-          underlineColorAndroid={colors.transparent}
-          textAlignVertical="top"
-          placeholder={placeholderContent}
-          placeholderTextColor={colors.textDim}
-          {...TextInputProps}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={colors.text.tertiary}
+          secureTextEntry={isSecureEntry}
           editable={!disabled}
-          style={themed($inputStyles)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          maxLength={maxLength}
+          style={[
+            styles.input,
+            inputStyle,
+            disabled && styles.inputDisabled,
+          ]}
+          {...textInputProps}
         />
 
-        {!!RightAccessory && (
-          <RightAccessory
-            style={themed($rightAccessoryStyle)}
-            status={status}
-            editable={!disabled}
-            multiline={TextInputProps.multiline ?? false}
-          />
-        )}
-      </Animated.View>
+        {/* Right Icon or Password Toggle */}
+        {showPasswordToggle ? (
+          <TouchableOpacity
+            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            style={styles.rightIcon}
+            accessibilityLabel={isPasswordVisible ? "Hide password" : "Show password"}
+            accessibilityRole="button"
+          >
+            <Text style={styles.passwordToggleText}>
+              {isPasswordVisible ? "Hide" : "Show"}
+            </Text>
+          </TouchableOpacity>
+        ) : rightIcon ? (
+          <View style={styles.rightIcon}>{rightIcon}</View>
+        ) : null}
+      </View>
 
-      {!!(helper || helperTx) && (
-        <Text
-          preset="formHelper"
-          text={helper}
-          tx={helperTx}
-          txOptions={helperTxOptions}
-          {...HelperTextProps}
-          style={themed($helperStyles)}
-        />
+      {/* Bottom Section: Error/Helper Text and Character Count */}
+      {(hasError || helperText || showCharacterCount) && (
+        <View style={styles.bottomSection}>
+          <View style={styles.messageContainer}>
+            {hasError && <Text style={styles.errorText}>{error}</Text>}
+            {!hasError && helperText && (
+              <Text style={styles.helperText}>{helperText}</Text>
+            )}
+          </View>
+          {showCharacterCount && maxLength && (
+            <Text style={styles.characterCount}>
+              {value.length}/{maxLength}
+            </Text>
+          )}
+        </View>
       )}
-    </TouchableOpacity>
+    </View>
   )
+}
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: spacing.md,
+  },
+  label: {
+    ...typography.label,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+  },
+  labelDisabled: {
+    color: colors.text.disabled,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: borderWidth.thin,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.background.primary,
+    paddingHorizontal: spacing.md,
+    minHeight: 48,
+  },
+  inputContainerDisabled: {
+    backgroundColor: colors.background.secondary,
+    borderColor: colors.border.light,
+  },
+  input: {
+    ...typography.input,
+    flex: 1,
+    color: colors.text.primary,
+    paddingVertical: spacing.sm,
+  },
+  inputDisabled: {
+    color: colors.text.disabled,
+  },
+  leftIcon: {
+    marginRight: spacing.xs,
+  },
+  rightIcon: {
+    marginLeft: spacing.xs,
+  },
+  passwordToggleText: {
+    ...typography.body2Medium,
+    color: colors.text.link,
+  },
+  bottomSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginTop: spacing.xs,
+  },
+  messageContainer: {
+    flex: 1,
+  },
+  errorText: {
+    ...typography.caption,
+    color: colors.text.error,
+  },
+  helperText: {
+    ...typography.caption,
+    color: colors.text.secondary,
+  },
+  characterCount: {
+    ...typography.caption,
+    color: colors.text.tertiary,
+    marginLeft: spacing.xs,
+  },
 })
 
-const $labelStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginBottom: spacing.xs,
-})
-
-const $inputWrapperStyle: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
-  alignItems: "flex-start",
-  borderWidth: 1.5,
-  borderRadius: 12,
-  backgroundColor: colors.palette.neutral100,
-  borderColor: colors.palette.neutral300,
-  overflow: "hidden",
-  paddingHorizontal: spacing.md,
-  paddingVertical: spacing.sm,
-})
-
-const $inputStyle: ThemedStyle<TextStyle> = ({ colors, typography }) => ({
-  flex: 1,
-  alignSelf: "stretch",
-  fontFamily: typography.primary.normal,
-  color: colors.text,
-  fontSize: 16,
-  height: 24,
-  // https://github.com/facebook/react-native/issues/21720#issuecomment-532642093
-  paddingVertical: 0,
-  paddingHorizontal: 0,
-})
-
-const $helperStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginTop: spacing.xs,
-})
-
-const $rightAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginEnd: spacing.xs,
-  height: 40,
-  justifyContent: "center",
-  alignItems: "center",
-})
-
-const $leftAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginStart: spacing.xs,
-  height: 40,
-  justifyContent: "center",
-  alignItems: "center",
-})

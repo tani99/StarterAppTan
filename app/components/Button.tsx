@@ -1,336 +1,327 @@
-import { ComponentType, useEffect, useRef } from "react"
-import {
-  Animated,
-  Pressable,
-  PressableProps,
-  PressableStateCallbackType,
-  StyleProp,
-  TextStyle,
-  ViewStyle,
-} from "react-native"
-
-import { useAppTheme } from "@/theme/context"
-import { $styles } from "@/theme/styles"
-import type { ThemedStyle, ThemedStyleArray } from "@/theme/types"
-
-import { Text, TextProps } from "./Text"
-
-type Presets = "default" | "filled" | "reversed" | "outline" | "ghost" | "elevated"
-type Sizes = "sm" | "md" | "lg"
-
-export interface ButtonAccessoryProps {
-  style: StyleProp<any>
-  pressableState: PressableStateCallbackType
-  disabled?: boolean
-}
-
-export interface ButtonProps extends PressableProps {
-  /**
-   * Text which is looked up via i18n.
-   */
-  tx?: TextProps["tx"]
-  /**
-   * The text to display if not using `tx` or nested components.
-   */
-  text?: TextProps["text"]
-  /**
-   * Optional options to pass to i18n. Useful for interpolation
-   * as well as explicitly setting locale or translation fallbacks.
-   */
-  txOptions?: TextProps["txOptions"]
-  /**
-   * An optional style override useful for padding & margin.
-   */
-  style?: StyleProp<ViewStyle>
-  /**
-   * An optional style override for the "pressed" state.
-   */
-  pressedStyle?: StyleProp<ViewStyle>
-  /**
-   * An optional style override for the button text.
-   */
-  textStyle?: StyleProp<TextStyle>
-  /**
-   * An optional style override for the button text when in the "pressed" state.
-   */
-  pressedTextStyle?: StyleProp<TextStyle>
-  /**
-   * An optional style override for the button text when in the "disabled" state.
-   */
-  disabledTextStyle?: StyleProp<TextStyle>
-  /**
-   * One of the different types of button presets.
-   */
-  preset?: Presets
-  /**
-   * Button size variant.
-   */
-  size?: Sizes
-  /**
-   * An optional component to render on the right side of the text.
-   * Example: `RightAccessory={(props) => <View {...props} />}`
-   */
-  RightAccessory?: ComponentType<ButtonAccessoryProps>
-  /**
-   * An optional component to render on the left side of the text.
-   * Example: `LeftAccessory={(props) => <View {...props} />}`
-   */
-  LeftAccessory?: ComponentType<ButtonAccessoryProps>
-  /**
-   * Children components.
-   */
-  children?: React.ReactNode
-  /**
-   * disabled prop, accessed directly for declarative styling reasons.
-   * https://reactnative.dev/docs/pressable#disabled
-   */
-  disabled?: boolean
-  /**
-   * An optional style override for the disabled state
-   */
-  disabledStyle?: StyleProp<ViewStyle>
-}
-
 /**
- * A component that allows users to take actions and make choices.
- * Wraps the Text component with a Pressable component.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Button/}
- * @param {ButtonProps} props - The props for the `Button` component.
- * @returns {JSX.Element} The rendered `Button` component.
- * @example
- * <Button
- *   tx="common:ok"
- *   style={styles.button}
- *   textStyle={styles.buttonText}
- *   onPress={handleButtonPress}
- * />
+ * Button Component
+ * 
+ * A highly customizable button component with multiple variants, sizes, and states
  */
-export function Button(props: ButtonProps) {
-  const {
-    tx,
-    text,
-    txOptions,
-    style: $viewStyleOverride,
-    pressedStyle: $pressedViewStyleOverride,
-    textStyle: $textStyleOverride,
-    pressedTextStyle: $pressedTextStyleOverride,
-    disabledTextStyle: $disabledTextStyleOverride,
-    children,
-    RightAccessory,
-    LeftAccessory,
-    disabled,
-    disabledStyle: $disabledViewStyleOverride,
-    ...rest
-  } = props
 
-  const { themed } = useAppTheme()
-  const scaleAnim = useRef(new Animated.Value(1)).current
+import React from "react"
+import {
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+  View,
+} from "react-native"
+import { colors, spacing, typography, borderRadius } from "../theme"
 
-  const preset: Presets = props.preset ?? "default"
-  const size: Sizes = props.size ?? "md"
+export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "destructive"
+export type ButtonSize = "small" | "medium" | "large"
 
-  // Animation handlers
-  const handlePressIn = () => {
-    Animated.timing(scaleAnim, {
-      toValue: 0.95,
-      duration: 200,
-      useNativeDriver: true,
-    }).start()
-  }
-
-  const handlePressOut = () => {
-    Animated.timing(scaleAnim, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: true,
-    }).start()
-  }
+export interface ButtonProps {
+  /**
+   * Button text content
+   */
+  children: string
 
   /**
-   * @param {PressableStateCallbackType} root0 - The root object containing the pressed state.
-   * @param {boolean} root0.pressed - The pressed state.
-   * @returns {StyleProp<ViewStyle>} The view style based on the pressed state.
+   * Button press handler
    */
-  function $viewStyle({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> {
-    return [
-      themed($viewPresets[preset]),
-      themed($sizePresets[size]),
-      $viewStyleOverride,
-      !!pressed && themed([$pressedViewPresets[preset], $pressedViewStyleOverride]),
-      !!disabled && $disabledViewStyleOverride,
-    ]
-  }
+  onPress: () => void
+
   /**
-   * @param {PressableStateCallbackType} root0 - The root object containing the pressed state.
-   * @param {boolean} root0.pressed - The pressed state.
-   * @returns {StyleProp<TextStyle>} The text style based on the pressed state.
+   * Visual variant of the button
+   * @default "primary"
    */
-  function $textStyle({ pressed }: PressableStateCallbackType): StyleProp<TextStyle> {
-    return [
-      themed($textPresets[preset]),
-      $textStyleOverride,
-      !!pressed && themed([$pressedTextPresets[preset], $pressedTextStyleOverride]),
-      !!disabled && $disabledTextStyleOverride,
-    ]
-  }
+  variant?: ButtonVariant
+
+  /**
+   * Size of the button
+   * @default "medium"
+   */
+  size?: ButtonSize
+
+  /**
+   * Whether the button is disabled
+   * @default false
+   */
+  disabled?: boolean
+
+  /**
+   * Whether the button is in loading state
+   * @default false
+   */
+  loading?: boolean
+
+  /**
+   * Icon to display on the left side of the text
+   */
+  leftIcon?: React.ReactNode
+
+  /**
+   * Icon to display on the right side of the text
+   */
+  rightIcon?: React.ReactNode
+
+  /**
+   * Whether the button should take full width of its container
+   * @default false
+   */
+  fullWidth?: boolean
+
+  /**
+   * Custom style for the button container
+   */
+  style?: ViewStyle
+
+  /**
+   * Custom style for the button text
+   */
+  textStyle?: TextStyle
+
+  /**
+   * Accessibility label
+   */
+  accessibilityLabel?: string
+}
+
+export function Button({
+  children,
+  onPress,
+  variant = "primary",
+  size = "medium",
+  disabled = false,
+  loading = false,
+  leftIcon,
+  rightIcon,
+  fullWidth = false,
+  style,
+  textStyle,
+  accessibilityLabel,
+}: ButtonProps) {
+  const isDisabled = disabled || loading
+
+  // Get variant-specific styles
+  const variantStyles = getVariantStyles(variant, isDisabled)
+  
+  // Get size-specific styles
+  const sizeStyles = getSizeStyles(size)
+
+  // Get text size
+  const textSizeStyle = getTextSizeStyle(size)
 
   return (
-    <Pressable
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={isDisabled}
+      activeOpacity={0.7}
       accessibilityRole="button"
-      accessibilityState={{ disabled: !!disabled }}
-      {...rest}
-      disabled={disabled}
+      accessibilityLabel={accessibilityLabel || children}
+      accessibilityState={{ disabled: isDisabled }}
+      style={[
+        styles.button,
+        variantStyles.container,
+        sizeStyles.container,
+        fullWidth && styles.fullWidth,
+        isDisabled && styles.disabled,
+        style,
+      ]}
     >
-      {(state) => (
-        <Animated.View
-          style={[
-            $viewStyle(state),
-            {
-              transform: [{ scale: scaleAnim }],
-            },
-          ]}
-        >
-          {!!LeftAccessory && (
-            <LeftAccessory style={$leftAccessoryStyle} pressableState={state} disabled={disabled} />
-          )}
-
-          <Text tx={tx} text={text} txOptions={txOptions} style={$textStyle(state)}>
+      {loading ? (
+        <ActivityIndicator
+          size="small"
+          color={variantStyles.activityIndicatorColor}
+        />
+      ) : (
+        <View style={styles.content}>
+          {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
+          <Text
+            style={[
+              styles.text,
+              variantStyles.text,
+              textSizeStyle,
+              textStyle,
+            ]}
+          >
             {children}
           </Text>
-
-          {!!RightAccessory && (
-            <RightAccessory
-              style={$rightAccessoryStyle}
-              pressableState={state}
-              disabled={disabled}
-            />
-          )}
-        </Animated.View>
+          {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
+        </View>
       )}
-    </Pressable>
+    </TouchableOpacity>
   )
 }
 
-const $baseViewStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  borderRadius: 12,
-  justifyContent: "center",
-  alignItems: "center",
-  overflow: "hidden",
+/**
+ * Get variant-specific styles
+ */
+function getVariantStyles(variant: ButtonVariant, disabled: boolean) {
+  if (disabled) {
+    return {
+      container: {
+        backgroundColor: colors.button.primaryDisabled,
+        borderColor: "transparent",
+      } as ViewStyle,
+      text: {
+        color: colors.text.disabled,
+      } as TextStyle,
+      activityIndicatorColor: colors.text.disabled,
+    }
+  }
+
+  switch (variant) {
+    case "primary":
+      return {
+        container: {
+          backgroundColor: colors.button.primaryBackground,
+          borderColor: "transparent",
+        } as ViewStyle,
+        text: {
+          color: colors.button.primaryText,
+        } as TextStyle,
+        activityIndicatorColor: colors.button.primaryText,
+      }
+
+    case "secondary":
+      return {
+        container: {
+          backgroundColor: colors.button.secondaryBackground,
+          borderColor: "transparent",
+        } as ViewStyle,
+        text: {
+          color: colors.button.secondaryText,
+        } as TextStyle,
+        activityIndicatorColor: colors.button.secondaryText,
+      }
+
+    case "outline":
+      return {
+        container: {
+          backgroundColor: colors.button.outlineBackground,
+          borderColor: colors.button.outlineBorder,
+          borderWidth: 2,
+        } as ViewStyle,
+        text: {
+          color: colors.button.outlineText,
+        } as TextStyle,
+        activityIndicatorColor: colors.button.outlineText,
+      }
+
+    case "ghost":
+      return {
+        container: {
+          backgroundColor: colors.button.ghostBackground,
+          borderColor: "transparent",
+        } as ViewStyle,
+        text: {
+          color: colors.button.ghostText,
+        } as TextStyle,
+        activityIndicatorColor: colors.button.ghostText,
+      }
+
+    case "destructive":
+      return {
+        container: {
+          backgroundColor: colors.button.destructiveBackground,
+          borderColor: "transparent",
+        } as ViewStyle,
+        text: {
+          color: colors.button.destructiveText,
+        } as TextStyle,
+        activityIndicatorColor: colors.button.destructiveText,
+      }
+
+    default:
+      return {
+        container: {} as ViewStyle,
+        text: {} as TextStyle,
+        activityIndicatorColor: colors.text.primary,
+      }
+  }
+}
+
+/**
+ * Get size-specific styles
+ */
+function getSizeStyles(size: ButtonSize) {
+  switch (size) {
+    case "small":
+      return {
+        container: {
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.xs,
+          minHeight: 36,
+        } as ViewStyle,
+      }
+
+    case "medium":
+      return {
+        container: {
+          paddingHorizontal: spacing.xl,
+          paddingVertical: spacing.sm,
+          minHeight: 44,
+        } as ViewStyle,
+      }
+
+    case "large":
+      return {
+        container: {
+          paddingHorizontal: spacing.xxl,
+          paddingVertical: spacing.md,
+          minHeight: 52,
+        } as ViewStyle,
+      }
+
+    default:
+      return {
+        container: {} as ViewStyle,
+      }
+  }
+}
+
+/**
+ * Get text size style
+ */
+function getTextSizeStyle(size: ButtonSize): TextStyle {
+  switch (size) {
+    case "small":
+      return typography.buttonSmall
+    case "medium":
+      return typography.buttonMedium
+    case "large":
+      return typography.buttonLarge
+    default:
+      return typography.buttonMedium
+  }
+}
+
+const styles = StyleSheet.create({
+  button: {
+    borderRadius: borderRadius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    textAlign: "center",
+  },
+  leftIcon: {
+    marginRight: spacing.xs,
+  },
+  rightIcon: {
+    marginLeft: spacing.xs,
+  },
+  fullWidth: {
+    width: "100%",
+  },
+  disabled: {
+    opacity: 0.6,
+  },
 })
 
-const $sizePresets: Record<Sizes, ThemedStyle<ViewStyle>> = {
-  sm: ({ spacing }) => ({
-    minHeight: 40,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-  }),
-  md: ({ spacing }) => ({
-    minHeight: 48,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-  }),
-  lg: ({ spacing }) => ({
-    minHeight: 56,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.lg,
-  }),
-}
-
-const $baseTextStyle: ThemedStyle<TextStyle> = ({ typography }) => ({
-  fontSize: 16,
-  lineHeight: 20,
-  fontFamily: typography.primary.medium,
-  textAlign: "center",
-  flexShrink: 1,
-  flexGrow: 0,
-  zIndex: 2,
-})
-
-const $rightAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginStart: spacing.xs,
-  zIndex: 1,
-})
-const $leftAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginEnd: spacing.xs,
-  zIndex: 1,
-})
-
-const $viewPresets: Record<Presets, ThemedStyleArray<ViewStyle>> = {
-  default: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors }) => ({
-      borderWidth: 1,
-      borderColor: colors.palette.neutral400,
-      backgroundColor: colors.palette.neutral100,
-    }),
-  ],
-  filled: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors }) => ({ backgroundColor: colors.palette.neutral300 }),
-  ],
-  reversed: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors }) => ({ backgroundColor: colors.palette.neutral800 }),
-  ],
-  outline: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors }) => ({
-      borderWidth: 2,
-      borderColor: colors.palette.primary500,
-      backgroundColor: "transparent",
-    }),
-  ],
-  ghost: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors }) => ({
-      backgroundColor: "transparent",
-      borderWidth: 0,
-    }),
-  ],
-  elevated: [
-    $styles.row,
-    $baseViewStyle,
-    ({ colors, spacing }) => ({
-      backgroundColor: colors.palette.primary500,
-      shadowColor: colors.palette.neutral800,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 6,
-    }),
-  ],
-}
-
-const $textPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
-  default: [$baseTextStyle],
-  filled: [$baseTextStyle],
-  reversed: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.neutral100 })],
-  outline: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.primary500 })],
-  ghost: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.primary500 })],
-  elevated: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.neutral100 })],
-}
-
-const $pressedViewPresets: Record<Presets, ThemedStyle<ViewStyle>> = {
-  default: ({ colors }) => ({ backgroundColor: colors.palette.neutral200 }),
-  filled: ({ colors }) => ({ backgroundColor: colors.palette.neutral400 }),
-  reversed: ({ colors }) => ({ backgroundColor: colors.palette.neutral700 }),
-  outline: ({ colors }) => ({ backgroundColor: colors.palette.neutral100 }),
-  ghost: ({ colors }) => ({ backgroundColor: colors.palette.neutral100 }),
-  elevated: ({ colors }) => ({ backgroundColor: colors.palette.primary600 }),
-}
-
-const $pressedTextPresets: Record<Presets, ThemedStyle<TextStyle>> = {
-  default: () => ({ opacity: 0.9 }),
-  filled: () => ({ opacity: 0.9 }),
-  reversed: () => ({ opacity: 0.9 }),
-  outline: () => ({ opacity: 0.9 }),
-  ghost: () => ({ opacity: 0.9 }),
-  elevated: () => ({ opacity: 0.9 }),
-}

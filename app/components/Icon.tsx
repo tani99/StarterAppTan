@@ -1,130 +1,172 @@
-import {
-  Image,
-  ImageStyle,
-  StyleProp,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View,
-  ViewProps,
-  ViewStyle,
-} from "react-native"
+/**
+ * Icon Component
+ * 
+ * A wrapper around react-native-vector-icons for consistent icon usage
+ */
 
-import { useAppTheme } from "@/theme/context"
+import React from "react"
+import { TextStyle, ViewStyle, View, StyleSheet } from "react-native"
+import MaterialIcons from "react-native-vector-icons/MaterialIcons"
+import Ionicons from "react-native-vector-icons/Ionicons"
+import FontAwesome from "react-native-vector-icons/FontAwesome"
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
+import { colors } from "../theme"
 
-export type IconTypes = keyof typeof iconRegistry
+export type IconFamily = "material" | "ionicons" | "fontawesome" | "fontawesome5"
+export type IconSize = "xs" | "sm" | "md" | "lg" | "xl" | "xxl"
 
-type BaseIconProps = {
+const ICON_SIZES = {
+  xs: 12,
+  sm: 16,
+  md: 20,
+  lg: 24,
+  xl: 32,
+  xxl: 40,
+}
+
+export interface IconProps {
   /**
-   * The name of the icon
+   * Icon name (must match the icon family's naming convention)
    */
-  icon: IconTypes
+  name: string
 
   /**
-   * An optional tint color for the icon
+   * Icon family/library to use
+   * @default "material"
+   */
+  family?: IconFamily
+
+  /**
+   * Size of the icon (predefined or custom number)
+   * @default "md"
+   */
+  size?: IconSize | number
+
+  /**
+   * Color of the icon
+   * @default colors.text.primary
    */
   color?: string
 
   /**
-   * An optional size for the icon. If not provided, the icon will be sized to the icon's resolution.
+   * Custom style for the icon
    */
-  size?: number
+  style?: TextStyle
 
   /**
-   * Style overrides for the icon image
+   * Container style
    */
-  style?: StyleProp<ImageStyle>
+  containerStyle?: ViewStyle
 
   /**
-   * Style overrides for the icon container
+   * Accessibility label
    */
-  containerStyle?: StyleProp<ViewStyle>
+  accessibilityLabel?: string
 }
 
-type PressableIconProps = Omit<TouchableOpacityProps, "style"> & BaseIconProps
-type IconProps = Omit<ViewProps, "style"> & BaseIconProps
+export function Icon({
+  name,
+  family = "material",
+  size = "md",
+  color = colors.text.primary,
+  style,
+  containerStyle,
+  accessibilityLabel,
+}: IconProps) {
+  // Determine the numeric size
+  const iconSize = typeof size === "number" ? size : ICON_SIZES[size]
+
+  // Select the appropriate icon component based on family
+  const getIconComponent = () => {
+    const commonProps = {
+      name,
+      size: iconSize,
+      color,
+      style,
+      accessibilityLabel,
+    }
+
+    switch (family) {
+      case "material":
+        return <MaterialIcons {...commonProps} />
+      case "ionicons":
+        return <Ionicons {...commonProps} />
+      case "fontawesome":
+        return <FontAwesome {...commonProps} />
+      case "fontawesome5":
+        return <FontAwesome5 {...commonProps} />
+      default:
+        return <MaterialIcons {...commonProps} />
+    }
+  }
+
+  if (containerStyle) {
+    return <View style={containerStyle}>{getIconComponent()}</View>
+  }
+
+  return getIconComponent()
+}
 
 /**
- * A component to render a registered icon.
- * It is wrapped in a <TouchableOpacity />
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Icon/}
- * @param {PressableIconProps} props - The props for the `PressableIcon` component.
- * @returns {JSX.Element} The rendered `PressableIcon` component.
+ * Predefined icon helpers for common use cases
  */
-export function PressableIcon(props: PressableIconProps) {
-  const {
-    icon,
-    color,
-    size,
-    style: $imageStyleOverride,
-    containerStyle: $containerStyleOverride,
-    ...pressableProps
-  } = props
-
-  const { theme } = useAppTheme()
-
-  const $imageStyle: StyleProp<ImageStyle> = [
-    $imageStyleBase,
-    { tintColor: color ?? theme.colors.text },
-    size !== undefined && { width: size, height: size },
-    $imageStyleOverride,
-  ]
-
-  return (
-    <TouchableOpacity {...pressableProps} style={$containerStyleOverride}>
-      <Image style={$imageStyle} source={iconRegistry[icon]} />
-    </TouchableOpacity>
-  )
+export const IconPresets = {
+  back: (props?: Partial<IconProps>) => (
+    <Icon name="arrow-back" family="material" {...props} />
+  ),
+  close: (props?: Partial<IconProps>) => (
+    <Icon name="close" family="material" {...props} />
+  ),
+  check: (props?: Partial<IconProps>) => (
+    <Icon name="check" family="material" {...props} />
+  ),
+  chevronRight: (props?: Partial<IconProps>) => (
+    <Icon name="chevron-right" family="material" {...props} />
+  ),
+  chevronLeft: (props?: Partial<IconProps>) => (
+    <Icon name="chevron-left" family="material" {...props} />
+  ),
+  chevronDown: (props?: Partial<IconProps>) => (
+    <Icon name="keyboard-arrow-down" family="material" {...props} />
+  ),
+  chevronUp: (props?: Partial<IconProps>) => (
+    <Icon name="keyboard-arrow-up" family="material" {...props} />
+  ),
+  email: (props?: Partial<IconProps>) => (
+    <Icon name="email" family="material" {...props} />
+  ),
+  lock: (props?: Partial<IconProps>) => (
+    <Icon name="lock" family="material" {...props} />
+  ),
+  person: (props?: Partial<IconProps>) => (
+    <Icon name="person" family="material" {...props} />
+  ),
+  settings: (props?: Partial<IconProps>) => (
+    <Icon name="settings" family="material" {...props} />
+  ),
+  logout: (props?: Partial<IconProps>) => (
+    <Icon name="logout" family="material" {...props} />
+  ),
+  menu: (props?: Partial<IconProps>) => (
+    <Icon name="menu" family="material" {...props} />
+  ),
+  home: (props?: Partial<IconProps>) => (
+    <Icon name="home" family="material" {...props} />
+  ),
+  search: (props?: Partial<IconProps>) => (
+    <Icon name="search" family="material" {...props} />
+  ),
+  error: (props?: Partial<IconProps>) => (
+    <Icon name="error" family="material" color={colors.error[500]} {...props} />
+  ),
+  success: (props?: Partial<IconProps>) => (
+    <Icon name="check-circle" family="material" color={colors.success[500]} {...props} />
+  ),
+  warning: (props?: Partial<IconProps>) => (
+    <Icon name="warning" family="material" color={colors.warning[500]} {...props} />
+  ),
+  info: (props?: Partial<IconProps>) => (
+    <Icon name="info" family="material" color={colors.info[500]} {...props} />
+  ),
 }
 
-/**
- * A component to render a registered icon.
- * It is wrapped in a <View />, use `PressableIcon` if you want to react to input
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Icon/}
- * @param {IconProps} props - The props for the `Icon` component.
- * @returns {JSX.Element} The rendered `Icon` component.
- */
-export function Icon(props: IconProps) {
-  const {
-    icon,
-    color,
-    size,
-    style: $imageStyleOverride,
-    containerStyle: $containerStyleOverride,
-    ...viewProps
-  } = props
-
-  const { theme } = useAppTheme()
-
-  const $imageStyle: StyleProp<ImageStyle> = [
-    $imageStyleBase,
-    { tintColor: color ?? theme.colors.text },
-    size !== undefined && { width: size, height: size },
-    $imageStyleOverride,
-  ]
-
-  return (
-    <View {...viewProps} style={$containerStyleOverride}>
-      <Image style={$imageStyle} source={iconRegistry[icon]} />
-    </View>
-  )
-}
-
-export const iconRegistry = {
-  back: require("@assets/icons/back.png"),
-  bell: require("@assets/icons/bell.png"),
-  caretLeft: require("@assets/icons/caretLeft.png"),
-  caretRight: require("@assets/icons/caretRight.png"),
-  check: require("@assets/icons/check.png"),
-  hidden: require("@assets/icons/hidden.png"),
-  ladybug: require("@assets/icons/ladybug.png"),
-  lock: require("@assets/icons/lock.png"),
-  menu: require("@assets/icons/menu.png"),
-  more: require("@assets/icons/more.png"),
-  settings: require("@assets/icons/settings.png"),
-  view: require("@assets/icons/view.png"),
-  x: require("@assets/icons/x.png"),
-}
-
-const $imageStyleBase: ImageStyle = {
-  resizeMode: "contain",
-}

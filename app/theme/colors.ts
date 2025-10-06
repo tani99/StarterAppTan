@@ -1,120 +1,189 @@
-const palette = {
-  // Modern primary color scale (50-900)
-  primary50: "#FEF7F0",
-  primary100: "#FEEBD7",
-  primary200: "#FDD4AE",
-  primary300: "#FCB885",
-  primary400: "#FA9C5C",
-  primary500: "#F88033", // Main brand color
-  primary600: "#E66B1A",
-  primary700: "#D4560A",
-  primary800: "#C24100",
-  primary900: "#B02C00",
-
-  // Enhanced neutral color scale (50-900)
-  neutral50: "#FAFAFA",
-  neutral100: "#F5F5F5",
-  neutral150: "#EEEEEE",
-  neutral200: "#E0E0E0",
-  neutral250: "#D4D4D4",
-  neutral300: "#BDBDBD",
-  neutral400: "#9E9E9E",
-  neutral500: "#757575",
-  neutral600: "#616161",
-  neutral700: "#424242",
-  neutral800: "#212121",
-  neutral850: "#1A1A1A",
-  neutral900: "#0F0F0F",
-
-  // Success colors
-  success50: "#F0FDF4",
-  success100: "#DCFCE7",
-  success500: "#22C55E",
-  success600: "#16A34A",
-  success700: "#15803D",
-
-  // Warning colors
-  warning50: "#FFFBEB",
-  warning100: "#FEF3C7",
-  warning500: "#F59E0B",
-  warning600: "#D97706",
-  warning700: "#B45309",
-
-  // Info colors
-  info50: "#EFF6FF",
-  info100: "#DBEAFE",
-  info500: "#3B82F6",
-  info600: "#2563EB",
-  info700: "#1D4ED8",
-
-  // Keep existing secondary colors for backward compatibility
-  secondary100: "#DCDDE9",
-  secondary200: "#BCC0D6",
-  secondary300: "#9196B9",
-  secondary400: "#626894",
-  secondary500: "#41476E",
-
-  // Keep existing accent colors for backward compatibility
-  accent100: "#FFEED4",
-  accent200: "#FFE1B2",
-  accent300: "#FDD495",
-  accent400: "#FBC878",
-  accent500: "#FFBB50",
-
-  // Keep existing angry colors for backward compatibility
-  angry100: "#F2D6CD",
-  angry500: "#C03403",
-
-  // Keep existing overlay colors
-  overlay20: "rgba(25, 16, 21, 0.2)",
-  overlay50: "rgba(25, 16, 21, 0.5)",
-} as const
+/**
+ * Color Palette for FashionApp
+ * 
+ * A comprehensive color system following modern design principles
+ */
 
 export const colors = {
   /**
-   * The palette is available to use, but prefer using the name.
-   * This is only included for rare, one-off cases. Try to use
-   * semantic names as much as possible.
+   * Primary Brand Colors
+   * Used for main CTAs, links, and brand identity
    */
-  palette,
+  primary: {
+    50: "#E6F2FF",
+    100: "#CCE5FF",
+    200: "#99CBFF",
+    300: "#66B0FF",
+    400: "#3396FF",
+    500: "#0066CC", // Main primary color
+    600: "#0052A3",
+    700: "#003D7A",
+    800: "#002952",
+    900: "#001429",
+  },
+
   /**
-   * A helper for making something see-thru.
+   * Secondary Colors
+   * Used for accents and complementary elements
    */
-  transparent: "rgba(0, 0, 0, 0)",
+  secondary: {
+    50: "#FEF7E6",
+    100: "#FDEFD0",
+    200: "#FBE0A1",
+    300: "#F9D072",
+    400: "#F7C143",
+    500: "#F59E0B", // Main secondary color
+    600: "#C47E09",
+    700: "#935F07",
+    800: "#623F04",
+    900: "#312002",
+  },
+
   /**
-   * The default text color in many components.
+   * Neutral Colors
+   * Used for text, backgrounds, and UI structure
    */
-  text: palette.neutral800,
+  neutral: {
+    white: "#FFFFFF",
+    black: "#000000",
+    50: "#F9FAFB",
+    100: "#F3F4F6",
+    200: "#E5E7EB",
+    300: "#D1D5DB",
+    400: "#9CA3AF",
+    500: "#6B7280",
+    600: "#4B5563",
+    700: "#374151",
+    800: "#1F2937",
+    900: "#111827",
+  },
+
   /**
-   * Secondary text information.
+   * Semantic Colors
+   * Used for status indicators and feedback
    */
-  textDim: palette.neutral600,
+  success: {
+    50: "#ECFDF5",
+    100: "#D1FAE5",
+    200: "#A7F3D0",
+    300: "#6EE7B7",
+    400: "#34D399",
+    500: "#10B981", // Main success color
+    600: "#059669",
+    700: "#047857",
+    800: "#065F46",
+    900: "#064E3B",
+  },
+
+  error: {
+    50: "#FEF2F2",
+    100: "#FEE2E2",
+    200: "#FECACA",
+    300: "#FCA5A5",
+    400: "#F87171",
+    500: "#EF4444", // Main error color
+    600: "#DC2626",
+    700: "#B91C1C",
+    800: "#991B1B",
+    900: "#7F1D1D",
+  },
+
+  warning: {
+    50: "#FFFBEB",
+    100: "#FEF3C7",
+    200: "#FDE68A",
+    300: "#FCD34D",
+    400: "#FBBF24",
+    500: "#F59E0B", // Main warning color
+    600: "#D97706",
+    700: "#B45309",
+    800: "#92400E",
+    900: "#78350F",
+  },
+
+  info: {
+    50: "#EFF6FF",
+    100: "#DBEAFE",
+    200: "#BFDBFE",
+    300: "#93C5FD",
+    400: "#60A5FA",
+    500: "#3B82F6", // Main info color
+    600: "#2563EB",
+    700: "#1D4ED8",
+    800: "#1E40AF",
+    900: "#1E3A8A",
+  },
+
   /**
-   * The default color of the screen background.
+   * Background Colors
+   * Used for page backgrounds and surfaces
    */
-  background: palette.neutral100,
+  background: {
+    primary: "#FFFFFF",
+    secondary: "#F9FAFB",
+    tertiary: "#F3F4F6",
+    overlay: "rgba(0, 0, 0, 0.5)",
+    overlayLight: "rgba(0, 0, 0, 0.3)",
+    card: "#FFFFFF",
+  },
+
   /**
-   * The default border color.
+   * Text Colors
+   * Used for typography hierarchy
    */
-  border: palette.neutral300,
+  text: {
+    primary: "#111827",
+    secondary: "#6B7280",
+    tertiary: "#9CA3AF",
+    disabled: "#D1D5DB",
+    inverse: "#FFFFFF",
+    link: "#0066CC",
+    error: "#EF4444",
+    success: "#10B981",
+  },
+
   /**
-   * The main tinting color.
+   * Border Colors
+   * Used for dividers, outlines, and boundaries
    */
-  tint: palette.primary500,
+  border: {
+    default: "#E5E7EB",
+    light: "#F3F4F6",
+    medium: "#D1D5DB",
+    dark: "#9CA3AF",
+    focus: "#0066CC",
+    error: "#EF4444",
+  },
+
   /**
-   * The inactive tinting color.
+   * Button Colors
+   * Specific colors for button states
    */
-  tintInactive: palette.neutral400,
-  /**
-   * A subtle color used for lines.
-   */
-  separator: palette.neutral200,
-  /**
-   * Error messages.
-   */
-  error: palette.angry500,
-  /**
-   * Error Background.
-   */
-  errorBackground: palette.angry100,
+  button: {
+    primaryBackground: "#0066CC",
+    primaryText: "#FFFFFF",
+    primaryPressed: "#0052A3",
+    primaryDisabled: "#CCE5FF",
+    
+    secondaryBackground: "#F3F4F6",
+    secondaryText: "#111827",
+    secondaryPressed: "#E5E7EB",
+    secondaryDisabled: "#F9FAFB",
+    
+    outlineBackground: "transparent",
+    outlineText: "#0066CC",
+    outlineBorder: "#0066CC",
+    outlinePressed: "#E6F2FF",
+    
+    ghostBackground: "transparent",
+    ghostText: "#6B7280",
+    ghostPressed: "#F3F4F6",
+    
+    destructiveBackground: "#EF4444",
+    destructiveText: "#FFFFFF",
+    destructivePressed: "#DC2626",
+  },
 } as const
+
+export type Colors = typeof colors
+

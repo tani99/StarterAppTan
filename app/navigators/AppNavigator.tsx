@@ -86,10 +86,12 @@ export const AppNavigator = (props: NavigationProps) => {
     config: {
       screens: {
         // Auth screens
+        Welcome: "welcome",
         Login: "login",
         Register: "register",
+        ForgotPassword: "forgot-password",
         // Main app screens
-        Welcome: "welcome",
+        Profile: "profile",
         // Add more screens as needed
       },
     },

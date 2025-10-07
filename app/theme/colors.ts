@@ -6,37 +6,54 @@
 
 export const colors = {
   /**
-   * Primary Brand Colors
+   * Primary Brand Colors - Bold Fashion Purple/Magenta
    * Used for main CTAs, links, and brand identity
    */
   primary: {
-    50: "#E6F2FF",
-    100: "#CCE5FF",
-    200: "#99CBFF",
-    300: "#66B0FF",
-    400: "#3396FF",
-    500: "#0066CC", // Main primary color
-    600: "#0052A3",
-    700: "#003D7A",
-    800: "#002952",
-    900: "#001429",
+    50: "#FAF5FF",
+    100: "#F3E8FF",
+    200: "#E9D5FF",
+    300: "#D8B4FE",
+    400: "#C084FC",
+    500: "#A855F7", // Main primary color - vibrant purple
+    600: "#9333EA",
+    700: "#7E22CE",
+    800: "#6B21A8",
+    900: "#581C87",
   },
 
   /**
-   * Secondary Colors
+   * Secondary Colors - Electric Pink/Magenta
    * Used for accents and complementary elements
    */
   secondary: {
-    50: "#FEF7E6",
-    100: "#FDEFD0",
-    200: "#FBE0A1",
-    300: "#F9D072",
-    400: "#F7C143",
-    500: "#F59E0B", // Main secondary color
-    600: "#C47E09",
-    700: "#935F07",
-    800: "#623F04",
-    900: "#312002",
+    50: "#FDF2F8",
+    100: "#FCE7F3",
+    200: "#FBCFE8",
+    300: "#F9A8D4",
+    400: "#F472B6",
+    500: "#EC4899", // Main secondary color - hot pink
+    600: "#DB2777",
+    700: "#BE185D",
+    800: "#9D174D",
+    900: "#831843",
+  },
+
+  /**
+   * Accent Colors - Neon Cyan
+   * Used for highlights and vibrant touches
+   */
+  accent: {
+    50: "#ECFEFF",
+    100: "#CFFAFE",
+    200: "#A5F3FC",
+    300: "#67E8F9",
+    400: "#22D3EE",
+    500: "#06B6D4", // Main accent color - electric cyan
+    600: "#0891B2",
+    700: "#0E7490",
+    800: "#155E75",
+    900: "#164E63",
   },
 
   /**
@@ -120,11 +137,18 @@ export const colors = {
    */
   background: {
     primary: "#FFFFFF",
-    secondary: "#F9FAFB",
-    tertiary: "#F3F4F6",
-    overlay: "rgba(0, 0, 0, 0.5)",
-    overlayLight: "rgba(0, 0, 0, 0.3)",
+    secondary: "#FAFAFA",
+    tertiary: "#F5F5F5",
+    dark: "#0A0A0A",
+    darkSecondary: "#1A1A1A",
+    overlay: "rgba(0, 0, 0, 0.7)",
+    overlayLight: "rgba(0, 0, 0, 0.4)",
     card: "#FFFFFF",
+    gradient: {
+      purple: ["#A855F7", "#EC4899"],
+      dark: ["#1A1A1A", "#0A0A0A"],
+      vibrant: ["#A855F7", "#EC4899", "#06B6D4"],
+    },
   },
 
   /**
@@ -132,14 +156,15 @@ export const colors = {
    * Used for typography hierarchy
    */
   text: {
-    primary: "#111827",
+    primary: "#0A0A0A",
     secondary: "#6B7280",
     tertiary: "#9CA3AF",
     disabled: "#D1D5DB",
     inverse: "#FFFFFF",
-    link: "#0066CC",
+    link: "#A855F7",
     error: "#EF4444",
     success: "#10B981",
+    accent: "#EC4899",
   },
 
   /**
@@ -151,7 +176,7 @@ export const colors = {
     light: "#F3F4F6",
     medium: "#D1D5DB",
     dark: "#9CA3AF",
-    focus: "#0066CC",
+    focus: "#A855F7",
     error: "#EF4444",
   },
 
@@ -160,24 +185,24 @@ export const colors = {
    * Specific colors for button states
    */
   button: {
-    primaryBackground: "#0066CC",
+    primaryBackground: "#A855F7",
     primaryText: "#FFFFFF",
-    primaryPressed: "#0052A3",
-    primaryDisabled: "#CCE5FF",
+    primaryPressed: "#9333EA",
+    primaryDisabled: "#E9D5FF",
     
-    secondaryBackground: "#F3F4F6",
-    secondaryText: "#111827",
-    secondaryPressed: "#E5E7EB",
-    secondaryDisabled: "#F9FAFB",
+    secondaryBackground: "#EC4899",
+    secondaryText: "#FFFFFF",
+    secondaryPressed: "#DB2777",
+    secondaryDisabled: "#FBCFE8",
     
     outlineBackground: "transparent",
-    outlineText: "#0066CC",
-    outlineBorder: "#0066CC",
-    outlinePressed: "#E6F2FF",
+    outlineText: "#A855F7",
+    outlineBorder: "#A855F7",
+    outlinePressed: "#FAF5FF",
     
     ghostBackground: "transparent",
     ghostText: "#6B7280",
-    ghostPressed: "#F3F4F6",
+    ghostPressed: "#F5F5F5",
     
     destructiveBackground: "#EF4444",
     destructiveText: "#FFFFFF",

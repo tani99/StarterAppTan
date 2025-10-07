@@ -95,9 +95,13 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
         setToastMessage("Welcome back!")
         setShowToast(true)
       } else {
-        // Show error
+        // Show error - extract message from error object
+        const errorMessage = 
+          typeof result.error === "string" 
+            ? result.error 
+            : result.error?.message || "Failed to sign in. Please try again."
         setToastType("error")
-        setToastMessage(result.error || "Failed to sign in. Please try again.")
+        setToastMessage(errorMessage)
         setShowToast(true)
       }
     } catch (error) {
@@ -238,7 +242,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
               >
                 Sign Up
               </Link>
-            </View>
+      </View>
 
             <Spacer size="xl" />
           </Container>
@@ -262,7 +266,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   keyboardView: {
-    flex: 1,
+  flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
@@ -291,8 +295,8 @@ const styles = StyleSheet.create({
   },
   signUpContainer: {
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+  justifyContent: "center",
+  alignItems: "center",
   },
   signUpText: {
     ...typography.body1,

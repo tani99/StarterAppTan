@@ -14,6 +14,7 @@ export type AuthStackParamList = {
  * Main application stack parameter list
  */
 export type AppStackParamList = {
+  Home: undefined
   Profile: undefined
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST

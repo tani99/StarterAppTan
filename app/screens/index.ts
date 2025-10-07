@@ -4,4 +4,5 @@ export * from "./ErrorScreen/ErrorBoundary"
 // @demo remove-current-line-in-ci
 // 🔥 Your screens go here
 export * from "./WelcomeScreen"
+export * from "./HomeScreen"
 export * from "./ProfileScreen"

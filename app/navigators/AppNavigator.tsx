@@ -11,7 +11,7 @@ import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navig
 import Config from "@/config"
 import { useAuth } from "@/context/AuthContext"
 import { ErrorBoundary } from "@/screens/ErrorScreen/ErrorBoundary"
-import { ProfileScreen } from "@/screens/index"
+import { HomeScreen, ProfileScreen } from "@/screens/index"
 import { AuthState } from "@/services/auth"
 
 import { AuthNavigator } from "./AuthNavigator"
@@ -62,8 +62,9 @@ const AppStack = () => {
           backgroundColor: "#FFFFFF",
         },
       }}
-      initialRouteName="Profile"
+      initialRouteName="Home"
     >
+      <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       {/** 🔥 Your screens go here */}
       {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
@@ -91,6 +92,7 @@ export const AppNavigator = (props: NavigationProps) => {
         Register: "register",
         ForgotPassword: "forgot-password",
         // Main app screens
+        Home: "home",
         Profile: "profile",
         // Add more screens as needed
       },

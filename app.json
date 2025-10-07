@@ -28,7 +28,7 @@
   "ios": {
     "icon": "./assets/images/app-icon-ios.png",
     "supportsTablet": true,
-    "bundleIdentifier": "com.fashionapp",
+    "bundleIdentifier": "com.fashionapptanisha",
     "googleServicesFile": "./ios/GoogleService-Info.plist",
     "privacyManifests": {
       "NSPrivacyAccessedAPITypes": [

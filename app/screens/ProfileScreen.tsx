@@ -178,7 +178,7 @@ export const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
   }
 
   return (
-    <Screen preset="fixed" safeAreaEdges={["top"]} style={styles.screen}>
+    <Screen preset="fixed" style={styles.screen}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}

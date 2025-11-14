@@ -55,7 +55,7 @@ export const WelcomeScreen = ({ navigation }: WelcomeScreenProps) => {
   }
 
   return (
-    <Screen preset="fixed" safeAreaEdges={["top", "bottom"]} style={styles.screen}>
+    <Screen preset="fixed" style={styles.screen}>
       <LinearGradient
         colors={[colors.primary[500], colors.secondary[500]]}
         start={{ x: 0, y: 0 }}

@@ -11,7 +11,7 @@ export interface ErrorDetailsProps {
 
 export function ErrorDetails(props: ErrorDetailsProps) {
   return (
-    <Screen style={$container}>
+    <Screen safeAreaEdges={["top", "bottom"]} style={$container}>
       <View style={$centerContent}>
         <Text text="Error Details Screen" style={$title} />
         <Text text={`Error: ${props.error.message}`} style={$errorText} />

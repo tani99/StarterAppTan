@@ -122,7 +122,7 @@ export const ForgotPasswordScreen = ({ navigation }: ForgotPasswordScreenProps) 
   }
 
   return (
-    <Screen preset="fixed" safeAreaEdges={["top"]} style={styles.screen}>
+    <Screen preset="fixed" style={styles.screen}>
       <KeyboardAvoidingView {...KeyboardConfig.form} style={styles.keyboardView}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}

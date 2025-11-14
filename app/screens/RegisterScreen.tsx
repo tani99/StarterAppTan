@@ -189,7 +189,7 @@ export const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
   }
 
   return (
-    <Screen preset="fixed" safeAreaEdges={["top"]} style={styles.screen}>
+    <Screen preset="fixed" style={styles.screen}>
       <KeyboardAvoidingView {...KeyboardConfig.form} style={styles.keyboardView}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}

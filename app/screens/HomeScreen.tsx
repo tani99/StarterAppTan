@@ -75,7 +75,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <Text style={styles.appTitle}>FASHION</Text>
+              <Text style={styles.appTitle}>App</Text>
             </View>
             <TouchableOpacity
               onPress={navigateToProfile}

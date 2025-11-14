@@ -91,8 +91,8 @@ export const WelcomeScreen = ({ navigation }: WelcomeScreenProps) => {
                 <Spacer size="xl" />
 
                 {/* App Name - Bold, Editorial Style */}
-                <Text style={styles.appName}>FASHION</Text>
-                <Text style={styles.appNameSecondary}>APP</Text>
+                <Text style={styles.appName}>App</Text>
+                <Text style={styles.appNameSecondary}>new</Text>
 
                 <Spacer size="md" />
 

@@ -1,7 +1,7 @@
 {
-  "name": "FashionApp",
-  "slug": "fashionapp",
-  "scheme": "fashionapp",
+  "name": "StarterAppTan",
+  "slug": "starterapptan",
+  "scheme": "starterapptan",
   "version": "1.0.0",
   "orientation": "portrait",
   "userInterfaceStyle": "automatic",
@@ -16,7 +16,7 @@
   ],
   "android": {
     "icon": "./assets/images/app-icon-android-legacy.png",
-    "package": "com.fashionapp",
+    "package": "com.starterapptan",
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
       "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
@@ -28,7 +28,7 @@
   "ios": {
     "icon": "./assets/images/app-icon-ios.png",
     "supportsTablet": true,
-    "bundleIdentifier": "com.fashionapptanisha",
+    "bundleIdentifier": "com.starterapptan",
     "googleServicesFile": "./ios/GoogleService-Info.plist",
     "privacyManifests": {
       "NSPrivacyAccessedAPITypes": [

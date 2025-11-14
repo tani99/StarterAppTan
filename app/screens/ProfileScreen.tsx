@@ -59,18 +59,6 @@ export const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
   }, [user])
 
   /**
-   * Get user initials for avatar
-   */
-  const getUserInitials = (): string => {
-    if (!user?.displayName) return user?.email?.[0]?.toUpperCase() || "U"
-    const names = user.displayName.split(" ")
-    if (names.length >= 2) {
-      return (names[0][0] + names[1][0]).toUpperCase()
-    }
-    return user.displayName.substring(0, 2).toUpperCase()
-  }
-
-  /**
    * Toggle edit mode
    */
   const handleEditToggle = () => {
@@ -140,7 +128,7 @@ export const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
   const handleChangePassword = () => {
     // Navigate to ForgotPassword screen
     // Note: In a real app, you might want a separate change password flow
-    setToastType("info")
+    setToastType("success")
     setToastMessage("Password reset email will be sent to your email.")
     setShowToast(true)
   }
@@ -198,22 +186,14 @@ export const ProfileScreen = ({ navigation }: ProfileScreenProps) => {
 
           <Spacer size="xl" />
 
-          {/* User Avatar and Info */}
+          {/* User Info */}
           <View style={styles.profileHeader}>
-            <View style={styles.avatarContainer}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{getUserInitials()}</Text>
-              </View>
-            </View>
-
-            <Spacer size="md" />
-
             <Text style={styles.userName}>{user?.displayName || "User"}</Text>
-            <Spacer size="xxs" />
+            <Spacer size="xs" />
             <Text style={styles.userEmail}>{user?.email}</Text>
           </View>
 
-          <Spacer size="xxxl" />
+          <Spacer size="xl" />
 
           {/* Profile Information Card */}
           <Text style={styles.sectionTitle}>Profile Information</Text>
@@ -393,41 +373,15 @@ const styles = StyleSheet.create({
     marginLeft: -spacing.xs,
   },
   profileHeader: {
-    alignItems: "center",
-  },
-  avatarContainer: {
-    alignItems: "center",
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.primary[500],
-    alignItems: "center",
-    justifyContent: "center",
-    ...StyleSheet.flatten({
-      shadowColor: colors.neutral.black,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 8,
-      elevation: 4,
-    }),
-  },
-  avatarText: {
-    fontSize: 36,
-    fontWeight: "700",
-    color: colors.neutral.white,
-    letterSpacing: 2,
+    alignItems: "flex-start",
   },
   userName: {
-    ...typography.heading3,
+    ...typography.heading2,
     color: colors.text.primary,
-    textAlign: "center",
   },
   userEmail: {
     ...typography.body1,
     color: colors.text.secondary,
-    textAlign: "center",
   },
   sectionTitle: {
     ...typography.heading6,

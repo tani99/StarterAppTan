@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: colors.text.primary,
     paddingVertical: spacing.sm,
+    textAlignVertical: 'center',
   },
   inputDisabled: {
     color: colors.text.disabled,

@@ -210,7 +210,7 @@ export const typography = {
     fontFamily: fontFamily.regular,
     fontSize: fontSize.base, // 16px
     fontWeight: fontWeight.regular,
-    lineHeight: fontSize.base * lineHeight.normal, // 24px
+    // Note: lineHeight is omitted for TextInput to avoid vertical alignment issues
   } as TextStyle,
 
   /**
